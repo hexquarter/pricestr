@@ -1,19 +1,17 @@
 import Hero from "@/components/Hero";
-import LiveTicker from "@/components/LiveTicker";
 import HowItWorks from "@/components/HowItWorks";
-import WhySigrate from "@/components/WhySigrate";
-import ProofModel from "@/components/ProofModel";
+import Verify from "@/components/Verify";
 import PricingTiers from "@/components/PricingTiers";
 import GetStarted from "@/components/GetStarted";
 import Footer from "@/components/Footer";
+import SignalChain from "@/components/SignalChain";
 
 const Index = () => (
-  <main className="min-h-screen bg-background">
+  <main className="min-h-screen flex flex-col gap-20 bg-black/50">
     <Hero />
-    <LiveTicker />
     <HowItWorks />
-    <WhySigrate />
-    <ProofModel />
+    <Verify />
+    <SignalChain />
     <PricingTiers />
     <GetStarted />
     <Footer />

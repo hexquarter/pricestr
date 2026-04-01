@@ -9,7 +9,7 @@ const Footer = () => (
   <footer className="border-t border-border py-12">
     <div className="max-w-5xl mx-auto px-6">
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        <span className="font-mono text-lg font-bold tracking-tight">Sigrate</span>
+        <span className="font-title uppercase text-lg font-bold tracking-widest font-[900]">Price<span className="text-violet-400">str</span></span>
         <nav className="flex items-center gap-6">
           {links.map((link) => (
             <a
@@ -22,7 +22,7 @@ const Footer = () => (
           ))}
         </nav>
       </div>
-      <p className="text-xs text-muted-foreground text-center mt-8">
+      <p className="text-xs text-muted-foreground/80 text-center mt-8 font-mono uppercase">
         Built for the Nostr ecosystem.
       </p>
     </div>

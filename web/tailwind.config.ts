@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        title: ['Barlow Condensed', 'sans-serif'],
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
