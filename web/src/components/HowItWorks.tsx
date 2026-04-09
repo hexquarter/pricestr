@@ -19,7 +19,7 @@ const HowItWorks = () => (
         <div className="border border-white/10 border-l-0 p-5 flex flex-col gap-5">
           <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">02</p>
           <h3 className="tracking-tight font-[900] font-title uppercase text-4xl text-primary">Signed</h3>
-          <p className="leading-5 text-xs font-mono text-muted-foreground">Each price event is signed by Sigrate's Nostr keypair inside a hardened enclave. The signature is deterministic — any Nostr library can verify it in one function call.</p>
+          <p className="leading-5 text-xs font-mono text-muted-foreground">Each price event is signed by PriceStr's Nostr keypair inside a hardened enclave. The signature is deterministic — any Nostr library can verify it in one function call.</p>
         </div>
         <div className="border border-white/10 border-l-0 p-5 flex flex-col gap-5">
           <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">03</p>

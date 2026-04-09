@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-const nodes = [
-  { id: "sigrate", label: "SIGRATE", size: "lg" },
-];
-
 const relays = [
   { angle: 0, dist: 120, label: "relay-1" },
   { angle: 60, dist: 120, label: "relay-2" },

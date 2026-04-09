@@ -17,7 +17,7 @@ const SignalChain = () => (
                         <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">01</p>
                     </div>
                     <h3 className="tracking-tight font-[900] font-title uppercase text-4xl">Exchange APIs</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">Binance <br /> Kraken<br /> Coinbase<br /> OKX</p>
+                    <p className="leading-5 text-xs font-mono text-muted-foreground">Binance <br /> Kraken<br /> Coinbase</p>
                 </div>
                 <div className="border border-border/10 border-l-0 p-5 flex flex-col gap-5">
                     <div className="flex justify-between items-center">
@@ -33,7 +33,7 @@ const SignalChain = () => (
                         <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">03</p>
                     </div>
                     <h3 className="tracking-tight font-[900] font-title uppercase text-4xl flex items-center"> Signed Event</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">Immutable ID <br />Schnorr sign <br />Nostr JSON</p>
+                    <p className="leading-5 text-xs font-mono text-muted-foreground">Immutable ID <br />Tamper proof <br />Addressable event</p>
                 </div>
                 <div className="border border-border/10 p-5 border-l-0 flex flex-col gap-5">
                     <div className="flex justify-between items-center">
@@ -41,7 +41,7 @@ const SignalChain = () => (
                         <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">04</p>
                     </div>
                     <h3 className="tracking-tight font-[900] font-title uppercase text-4xl">Relay</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">wss://relay.damus <br />wss://nos.lol <br />wss://relay.primal.net <br />+ custom</p>
+                    <p className="leading-5 text-xs font-mono text-muted-foreground">wss://pricestr.xyz <br />wss://relay.damus <br />wss://relay.primal.net</p>
                 </div>
                 <div className="border border-border/10 p-5 border-l-0 flex flex-col gap-5">
                     <div className="flex justify-between items-center">
@@ -49,7 +49,7 @@ const SignalChain = () => (
                         <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">05</p>
                     </div>
                     <h3 className="tracking-tight font-[900] font-title uppercase text-4xl">Your app</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">Query <br />Verify <br />Consume price <br />No trust req.</p>
+                    <p className="leading-5 text-xs font-mono text-muted-foreground">Query <br />Verify <br />Consume price</p>
                 </div>
             </div>
         </div>
