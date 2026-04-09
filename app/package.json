@@ -1,13 +1,36 @@
 {
   "name": "app",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx src/main.ts",
+    "start": "NODE_ENV=production tsx src/main.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.19.3",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.1"
+  },
+  "dependencies": {
+    "@breeztech/breez-sdk-spark": "^0.12.2",
+    "@buildonspark/spark-sdk": "^0.7.4",
+    "@noble/hashes": "^1.8.0",
+    "@nostr-relay/common": "^0.0.40",
+    "@nostr-relay/core": "^0.0.40",
+    "@nostr-relay/event-repository-sqlite": "^0.0.40",
+    "@nostr-relay/validator": "^0.0.40",
+    "@scure/base": "^2.0.0",
+    "better-sqlite3": "^12.8.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "nostr-tools": "^2.23.3",
+    "ws": "^8.20.0",
+    "zod": "^4.3.6"
+  }
 }
