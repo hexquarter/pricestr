@@ -2,7 +2,7 @@ import ProofModel from "./ProofModel";
 import { SectionHeader } from "./SectionHeader";
 
 const HowItWorks = () => (
-  <section className="">
+  <section className="" id="how-it-works">
     <div className="max-w-7xl mx-auto px-6 flex flex-col gap-10">
       <SectionHeader title="Protocol" />
       <header className="flex justify-between items-center gap-5">
@@ -14,17 +14,17 @@ const HowItWorks = () => (
         <div className="border border-white/10 p-5 flex flex-col gap-5">
           <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">01</p>
           <h3 className="tracking-tight font-[900] font-title uppercase text-4xl text-primary">Aggregated</h3>
-          <p className="leading-5 text-xs font-mono text-muted-foreground">Price data is pulled from multiple exchange APIs each cycle. The median value is computed to eliminate outliers, spoofed ticks, and single-source manipulation vectors.</p>
+          <p className="leading-5 text-xs font-mono text-muted-foreground">Price data is pulled from multiple exchange APIs each cycle. The median value is computed to eliminate outliers, spoofed ticks, and single‑source manipulation. All aggregation code is open source – you can audit every line.</p>
         </div>
         <div className="border border-white/10 border-l-0 p-5 flex flex-col gap-5">
           <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">02</p>
           <h3 className="tracking-tight font-[900] font-title uppercase text-4xl text-primary">Signed</h3>
-          <p className="leading-5 text-xs font-mono text-muted-foreground">Each price event is signed by PriceStr's Nostr keypair inside a hardened enclave. The signature is deterministic — any Nostr library can verify it in one function call.</p>
+          <p className="leading-5 text-xs font-mono text-muted-foreground">Each price event is signed by PriceStr’s Nostr keypair on a secure, isolated server (hardware not required for verification). The signature is deterministic – any Nostr library can verify it in one function call.</p>
         </div>
         <div className="border border-white/10 border-l-0 p-5 flex flex-col gap-5">
           <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">03</p>
           <h3 className="tracking-tight font-[900] font-title uppercase text-4xl text-primary">Delivered</h3>
-          <p className="leading-5 text-xs font-mono text-muted-foreground">The signed event is broadcast across the Nostr relay network. Your application queries any relay — it doesn't matter which one. The signature is the truth, not the relay.</p>
+          <p className="leading-5 text-xs font-mono text-muted-foreground">The signed event is broadcast across the Nostr relay network. Your application queries any relay – it doesn’t matter which one. The signature is the truth, not the relay.</p>
         </div>
       </div>
 

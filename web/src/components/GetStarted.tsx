@@ -45,6 +45,7 @@ const GetStarted = () => {
                 </p>
                 <Button variant='outline' className="flex px-5 py-2 text-xs" onClick={() => handleCopy(relayPub)}>Copy</Button>
               </div>
+              <p className="text-muted-foreground text-sm mt-2">Add this pubkey to your relay subscriptions. <br />Every signed price event will appear in your feed. <br />Use <span className="text-white">wss://relay.pricestr.xyz</span> for free</p>
             </div>
           </div>
           <div className="border border-l-0 border-border/10 flex flex-col gap-5 lg:w-1/2">

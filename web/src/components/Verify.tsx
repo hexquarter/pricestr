@@ -40,21 +40,21 @@ const Verify = () => (
               <span className="text-primary">01</span>
               <div className="flex flex-col gap-2">
                 <p className="text-white font-semibold">Relay-agnostic truth</p>
-                <p className="text-muted-foreground leading-5">The cryptographic signature binds the price to PriceStr's public key — any relay delivering that event is verifiable, censorable by none.</p>
+                <p className="text-muted-foreground leading-5">The cryptographic signature binds the price to PriceStr’s public key. Any relay delivering that event is verifiable; none can censor or alter it without breaking the signature.</p>
               </div>
             </div>
             <div className="flex gap-10 border-b border-white/10 pb-5">
               <span className="text-primary">02</span>
               <div className="flex flex-col gap-2">
                 <p className="text-white font-semibold">Permanent history</p>
-                <p className="text-muted-foreground leading-5">Every event is permanently addressable by its ID. Relays store a full, queryable price history. No database access required — Nostr is the database.</p>
+                <p className="text-muted-foreground leading-5">Every event is permanently addressable by its ID. Relays store a full, queryable price history. No database required – Nostr is your database.</p>
               </div>
             </div>
             <div className="flex gap-10">
               <span className="text-primary">03</span>
               <div className="flex flex-col gap-2">
                 <p className="text-white font-semibold">One function call</p>
-                <p className="text-muted-foreground leading-5">Any Nostr library exposes a verify() function. Pass the event and the public key. Boolean result. No API keys, no trust boundary, no SDKs required.</p>
+                <p className="text-muted-foreground leading-5">Any Nostr library exposes verify(). Pass the event and the public key. Boolean result. No API keys, no trust boundary, no vendor lock‑in.</p>
               </div>
             </div>
           </div>

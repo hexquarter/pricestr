@@ -31,20 +31,27 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center overflow-hidden">
       <div className="flex flex-col md:flex-row justify-between w-full p-5 md:px-60 gap-20">
         <div className="relative z-10 flex flex-col gap-5 md:w-1/3">
+
           <h1 className="text-6xl md:text-8xl tracking-tight mb-6 font-[900] font-title uppercase">
             <span className="text-white">Price<span className="text-violet-500">Str</span></span>
           </h1>
-          <h2 className="text-lg">Signed <span className="text-primary">Bitcoin</span> price feed for Nostr</h2>
-          <div className="border-l border-primary pl-5 flex flex-col gap-1 font-mono uppercase tracking-tight text-left text-xs">
-            <p>Relay-distributed</p>
-            <p>Publicly auditable</p>
-            <p>Cryptographically signed</p>
+          <h2 className="text-2xl">Signed. Relayed. Verified.</h2>
+          <div className="border-l border-violet-400 pl-5 flex flex-col gap-1 text-left text-lg">
+            <p>The first verifiable Bitcoin price feed built natively for Nostr.</p>
+            <p>No API keys. No database.</p>
+            <p>Just a signature and a relay.</p>
           </div>
           <div className="flex gap-5 mt-10">
-            <Button className="bg-white w-full" asChild>
+            <Button className="bg-white" asChild>
               <Link to='#get-started'>View pubkey</Link>
             </Button>
-            <Button variant="outline" className="w-full">Read the docs</Button>
+            <Button variant="outline" asChild>
+              <Link to='#how-it-works'>Discover how it works</Link>
+            </Button>
+          </div>
+          <div className="flex gap-5">
+            <span className="py-2 px-4 text-xs rounded-full border text-center items-center border text-muted-foreground uppercase hover:text-white/80 hover:bg-white/10 hover:border-white/20">Open-source</span>
+            <span className="py-2 px-4 text-xs rounded-full border text-center items-center border-primary/20 text-primary/60 uppercase hover:text-primary/80 hover:bg-primary/10 hover:border-primary/20">Lightning payment</span>
           </div>
         </div>
 
@@ -69,19 +76,19 @@ const Hero = () => {
               >
                 <ChartTooltip
                   cursor={true}
-                  content={<ChartTooltipContent  className="w-[200px]" indicator='line' />}
+                  content={<ChartTooltipContent className="w-[200px]" indicator='line' />}
                 />
                 <YAxis domain={['dataMin - 100', 'dataMax + 100']} hide={true} />
                 {Object.entries(chartData[0]?.sources || {}).map(([source, _]) => (
                   <Line
-                  key={source}
-                  dataKey={`sources.${source}`}
-                  type="natural"
-                  stroke={source === 'binance' ? '#ffdd00' : source === 'coinbase' ? '#0059ff' : '#6532b7'}
-                  dot={false}
-                  opacity={0.2}
-                  strokeWidth={1}
-                  name={source}
+                    key={source}
+                    dataKey={`sources.${source}`}
+                    type="natural"
+                    stroke={source === 'binance' ? '#ffdd00' : source === 'coinbase' ? '#0059ff' : '#6532b7'}
+                    dot={false}
+                    opacity={0.2}
+                    strokeWidth={1}
+                    name={source}
                   />
                 ))}
                 <Line

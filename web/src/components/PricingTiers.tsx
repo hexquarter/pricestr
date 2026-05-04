@@ -1,5 +1,4 @@
 import { Check } from "lucide-react";
-import ProofModel from "./ProofModel";
 import { Button } from "./ui/button";
 import { SectionHeader } from "./SectionHeader";
 
@@ -12,7 +11,7 @@ const PricingTiers = () => (
           Simple <br /><span className="text-violet-400">Pricing</span>
         </h2>
       </header>
-      <div className="grid md:grid-cols-3">
+      <div className="grid md:grid-cols-4">
         <div className="border border-white/10 flex flex-col gap-5">
           <header className="flex flex-col gap-2 border-b p-5 ">
             <p className="text-xs font-mono uppercase text-muted-foreground">Communitity</p>
@@ -30,14 +29,14 @@ const PricingTiers = () => (
         </div>
         <div className="border border border-violet-400 flex flex-col gap-5">
           <header className="flex flex-col gap-2 border-b p-5 ">
-            <p className="text-xs font-mono uppercase text-muted-foreground">Professional</p>
-            <h3 className="tracking-tight font-[300] font-title text-5xl">$20</h3>
+            <p className="text-xs font-mono uppercase text-muted-foreground">Pro</p>
+            <h3 className="tracking-tight font-[300] font-title text-5xl">$15</h3>
           </header>
           <div className="flex flex-col p-5 text-xs font-mono text-muted-foreground gap-2 border-b border-border/10">
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> USD, EUR pairs</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Real-time feed</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Dedicated relay endpoints</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Webhook notifications</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> BTC/USD + Forex rates</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> 10‑second updates</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Webhooks (10k/month)</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Priority support</p>
           </div>
           <footer className="p-5 ">
             <Button variant='default' className="uppercase font-mono w-full">Subscribe</Button>
@@ -49,10 +48,10 @@ const PricingTiers = () => (
             <h3 className="tracking-tight font-[300] font-title text-5xl">Custom</h3>
           </header>
           <div className="flex flex-col p-5 text-xs font-mono text-muted-foreground gap-2 border-b border-border/10">
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> All Professional features</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Custom currency pairs</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Private relay infra</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> SLA guarantees</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> All Pro features</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Dedicated relay endpoint</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Private relay infrastructure</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Custom pairs & SLA </p>
           </div>
           <footer className="p-5 ">
             <Button variant='outline' className="uppercase font-mono w-full">Contact us</Button>
