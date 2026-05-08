@@ -1,13 +1,11 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useEffect, useRef } from "react";
-
-const queryClient = new QueryClient();
+import { RelayProvider } from "./hooks/use-relay";
 
 function ScrollToAnchor() {
   const location = useLocation();
@@ -34,7 +32,7 @@ function ScrollToAnchor() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <RelayProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -47,7 +45,7 @@ const App = () => (
         <ScrollToAnchor />
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
+  </RelayProvider>
 );
 
 export default App;

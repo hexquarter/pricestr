@@ -19,7 +19,7 @@ app.get('/', (req: Request, res: Response, next: NextFunction): void | Response 
             name: config.relayName,
             description: config.relayDesc,
             pubkey: config.relayPubkey,
-            supported_nips: [1, 42],
+            supported_nips: [1, 42]
         });
     }
     next();

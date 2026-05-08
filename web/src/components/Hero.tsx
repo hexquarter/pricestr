@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { lastPrices, PriceData, subscribePrice } from "@/lib/nostr";
+// import { lastPrices, PriceData, subscribePrice } from "@/lib/nostr";
 
 import { Line, LineChart, YAxis } from "recharts"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
 import { Link } from "react-router-dom";
+import { useRelay, PriceData } from "@/hooks/use-relay";
 
 const Hero = () => {
+  const { relay } = useRelay()
+
   const [chartData, setChartData] = useState<PriceData[]>([]);
   const [changePrices, setChangePrices] = useState([])
   const chartConfig = {} satisfies ChartConfig
 
   useEffect(() => {
-    lastPrices().then((data) => {
-      setChartData(data)
-      setChangePrices(data.map(d => d.aggregate).slice(0, 2))
 
-      subscribePrice((data) => {
+    if (relay) {
+      relay.subscribePrice('free', (data) => {
         setChartData(prev => [...prev, data]);
         setChangePrices(prev => {
           if (prev.length == 0) return [data.aggregate]
@@ -24,8 +25,9 @@ const Hero = () => {
           return [data.aggregate, prev[0]]
         })
       })
-    })
-  }, []);
+    }
+
+  }, [relay]);
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">

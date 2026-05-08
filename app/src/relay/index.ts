@@ -5,6 +5,7 @@ import { EventRepositorySqlite } from '@nostr-relay/event-repository-sqlite/dist
 import { db } from '../common/db.js';
 import { Validator } from '@nostr-relay/validator';
 import { PolicyPlugin } from './policy.js';
+import { PremiumPlugin } from './premium.js';
 
 export class PriceStrRelay extends NostrRelay {
     private eventRepository: EventRepository;
@@ -13,6 +14,7 @@ export class PriceStrRelay extends NostrRelay {
         super(eventRepository);
         this.eventRepository = eventRepository;
         this.register(new PolicyPlugin());
+        this.register(new PremiumPlugin())
     }
 
     async registerEvent(event: Event) {

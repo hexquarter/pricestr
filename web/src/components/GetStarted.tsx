@@ -3,7 +3,7 @@ import { Copy, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { SectionHeader } from "./SectionHeader";
-import { relayInfo } from "@/lib/nostr";
+// import { relayInfo } from "@/lib/nostr";
 
 const NPM_CMD = "npm install @pricestr/sdk";
 
@@ -13,10 +13,10 @@ const GetStarted = () => {
   const [relayPub, setRelayPub] = useState("")
 
   useEffect(() => {
-    relayInfo().then(info => {
-      console.log(info)
-      setRelayPub(info.pubkey)
-    })
+    // relayInfo().then(info => {
+    //   console.log(info)
+    //   setRelayPub(info.pubkey)
+    // })
   }, [])
 
   const handleCopy = (value) => {

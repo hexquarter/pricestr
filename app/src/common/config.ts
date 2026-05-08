@@ -40,6 +40,6 @@ export const config: Config = {
   sparkMnemonic: required('SPARK_MNEMONIC'),
   fastTierSats: parseInt(optional('FAST_TIER_SATS', '1000')),
   subDurationDays: parseInt(optional('SUB_DURATION_DAYS', '30')),
-  slowPollMs: parseInt(optional('PRICE_POLL_SLOW_MS', '60000')),
-  fastPollMs: parseInt(optional('PRICE_POLL_FAST_MS', '5000')),
+  slowPollMs: parseInt(optional('PRICE_POLL_SLOW_MS', '30000')),
+  fastPollMs: parseInt(optional('PRICE_POLL_FAST_MS', '10000')),
 }
