@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { SectionHeader } from "./SectionHeader";
+import SubscribeProModal from "./SubscribeProModal";
 
-const PricingTiers = () => (
+const PricingTiers = () => {
+  const [proOpen, setProOpen] = useState(false);
+  return (
   <section className="">
     <div className="max-w-7xl mx-auto px-6 flex flex-col gap-10">
       <SectionHeader title="Pricing" />
