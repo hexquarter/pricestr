@@ -21,7 +21,7 @@ const PricingTiers = () => (
             <p className="flex items-center gap-2"><Check className="text-primary h-3" /> BTC/USD public feed</p>
             <p className="flex items-center gap-2"><Check className="text-primary h-3" /> 60-second interval</p>
             <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Community support</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Signature verification</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Public relays</p>
           </div>
           <footer className="p-5 ">
             <Button variant='outline' className="uppercase font-mono w-full">Get started</Button>
@@ -36,7 +36,7 @@ const PricingTiers = () => (
             <p className="flex items-center gap-2"><Check className="text-primary h-3" /> BTC/USD + Forex rates</p>
             <p className="flex items-center gap-2"><Check className="text-primary h-3" /> 10‑second updates</p>
             <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Webhooks (10k/month)</p>
-            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Priority support</p>
+            <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Premium-relay</p>
           </div>
           <footer className="p-5 ">
             <Button variant='default' className="uppercase font-mono w-full">Subscribe</Button>

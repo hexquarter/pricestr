@@ -14,7 +14,7 @@ const Verify = () => (
           <span className="font-mono tracking-widest text-[10px] uppercase border-b border-white/10 pb-5">JSON / Nostr Event</span>
           <div className="flex flex-col font-mono text-xs gap-1 text-white">
             <span className="t">{`{`}</span>
-            <p className="pl-5"><span className="text-gray-400">"kind"</span>: <span className="text-primary">31890</span>,</p>
+            <p className="pl-5"><span className="text-gray-400">"kind"</span>: <span className="text-primary">30078</span>,</p>
             <p className="pl-5"><span className="text-gray-400">"pubkey"</span>: <span className="text-primary">"7f9da3c2...1b"</span>,</p>
             <p className="pl-5"><span className="text-gray-400">"created_at"</span>: <span className="text-primary">1714823944</span>,</p>
             <p className="pl-5"><span className="text-gray-400">"tags"</span>: {'['},</p>

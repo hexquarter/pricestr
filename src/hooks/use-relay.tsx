@@ -1,4 +1,5 @@
 import { finalizeEvent, generateSecretKey, NostrEvent, Relay } from 'nostr-tools';
+import { fetchRelayInformation, RelayInformation } from "nostr-tools/nip11";
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -16,7 +17,7 @@ export interface RelayContextType {
 const RelayContext = createContext<RelayContextType | undefined>(undefined);
 const sk = generateSecretKey()
 
-const RELAY = 'ws://localhost:7777'
+const RELAY = import.meta.env.DEV ? 'ws://localhost:7777' : 'wss://relay.pricestr.xyz'
 
 export function RelayProvider({ children }: { children: ReactNode }) {
 
@@ -45,6 +46,11 @@ class PricestrRelay {
             const signed = finalizeEvent(event, sk);
             return signed;
         };
+    }
+
+    async info(): Promise<RelayInformation> {
+        const relayInfo = await fetchRelayInformation(RELAY)
+        return relayInfo
     }
 
     async subscribePrice(tier: 'free' | 'premium', callback: (priceData: PriceData) => void) {

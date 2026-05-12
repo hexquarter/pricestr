@@ -3,13 +3,7 @@
 **PriceStr** is a cryptographically signed Bitcoin price feed built natively for the Nostr protocol.  
 It delivers median‑aggregated exchange prices (Binance, Kraken, Coinbase) as verifiable Nostr events.
 
-- **No API keys** – query any relay, verify the signature.
-- **No database** – Nostr is your price history.
-- **Verifiable by design** – the signature *is* the truth.
-
----
-
-## 🚀 Motivation
+## Motivation
 
 dApp developers often end up using centralized API endpoints for price data because on‑chain oracles are cumbersome and public APIs require API keys, rate limits, and trust.
 
@@ -24,7 +18,7 @@ No backend needed for the free tier. No database. No API key.
 
 ---
 
-## 📦 Features
+## Features
 
 ### Free Tier (available now)
 - BTC/USD price – 60‑second updates
@@ -56,32 +50,23 @@ No backend needed for the free tier. No database. No API key.
 4. Read the price from the content field or the price tag.
 
 ```js
-import { Relay, verifyEvent } from 'nostr-tools';
+import { Relay } from 'nostr-tools';
 
 const relay = await Relay.connect('wss://relay.pricestr.xyz');
-await relay.connect();
-
-const sub = relay.sub([
-    { 
-        kinds: [30078], 
-        authors: [PRICESTR_PUBKEY], 
-        "#t": [`pricestr/free`]
-    }
-]);
-
-sub.on('event', event => {
-  if (verifyEvent(event)) {
-    const price = JSON.parse(event.content).aggregate;
-    console.log(`BTC/USD: $${price}`);
-  } else {
-    console.warn('Invalid signature – discarding');
+relay.subscribe([{
+  kinds: [30078],
+  authors: ['c52621244ec0233d3cc9b1b74f3257f64977f1ce9f855e026ce151bc5b097439'],
+  "#t": ['pricestr/free']
+}], {
+  onevent(event) {
+    console.log(event.content;
   }
 });
 ```
 
 That’s it. No API key, no backend, no database.
 
-💰 Pro Tier access pattern (for developers)
+## Pro Tier access pattern (for developers)
 
 Pro subscribers get:
 - A dedicated relay endpoint (e.g., wss://relay.pricestr.xyz)

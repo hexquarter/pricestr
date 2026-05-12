@@ -15,7 +15,6 @@ const Hero = () => {
   const chartConfig = {} satisfies ChartConfig
 
   useEffect(() => {
-
     if (relay) {
       relay.subscribePrice('free', (data) => {
         setChartData(prev => [...prev, data]);
@@ -67,7 +66,7 @@ const Hero = () => {
               </span>
               Live
             </span>
-            <span>5s interval</span>
+            <span>60s interval</span>
           </div>
           <div className="border border-t-0 border-white/10">
             {/* <canvas height={251} width={899} id="price-chart"></canvas> */}
