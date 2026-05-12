@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { SectionHeader } from "./SectionHeader";
+import SubscribeProModal from "./SubscribeProModal";
 
-const PricingTiers = () => (
+const PricingTiers = () => {
+  const [proOpen, setProOpen] = useState(false);
+  return (
   <section className="">
     <div className="max-w-7xl mx-auto px-6 flex flex-col gap-10">
       <SectionHeader title="Pricing" />
@@ -39,7 +43,7 @@ const PricingTiers = () => (
             <p className="flex items-center gap-2"><Check className="text-primary h-3" /> Premium-relay</p>
           </div>
           <footer className="p-5 ">
-            <Button variant='default' className="uppercase font-mono w-full">Subscribe</Button>
+            <Button variant='default' className="uppercase font-mono w-full" onClick={() => setProOpen(true)}>Subscribe</Button>
           </footer>
         </div>
         <div className="border border-l-0 border-white/10 flex flex-col gap-5">
@@ -59,7 +63,9 @@ const PricingTiers = () => (
         </div>
       </div>
     </div>
+    <SubscribeProModal open={proOpen} onOpenChange={setProOpen} />
   </section>
-);
+  );
+};
 
 export default PricingTiers;
