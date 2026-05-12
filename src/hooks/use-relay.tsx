@@ -1,5 +1,5 @@
 import { finalizeEvent, generateSecretKey, NostrEvent, Relay } from 'nostr-tools';
-import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type PriceData = {
@@ -46,7 +46,6 @@ class PricestrRelay {
             return signed;
         };
     }
-
 
     async subscribePrice(tier: 'free' | 'premium', callback: (priceData: PriceData) => void) {
         const sub = () => this.relay.subscribe([{

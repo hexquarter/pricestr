@@ -1,0 +1,129 @@
+# PriceStr
+
+**PriceStr** is a cryptographically signed Bitcoin price feed built natively for the Nostr protocol.  
+It delivers median‑aggregated exchange prices (Binance, Kraken, Coinbase) as verifiable Nostr events.
+
+- **No API keys** – query any relay, verify the signature.
+- **No database** – Nostr is your price history.
+- **Verifiable by design** – the signature *is* the truth.
+
+---
+
+## 🚀 Motivation
+
+dApp developers often end up using centralized API endpoints for price data because on‑chain oracles are cumbersome and public APIs require API keys, rate limits, and trust.
+
+PriceStr flips the model:
+
+1. **Aggregate** – pull real‑time prices from multiple exchanges, compute the median.
+2. **Sign** – sign the result with a dedicated Nostr keypair (deterministic, any Nostr library can verify).
+3. **Broadcast** – publish the signed event to the Nostr relay network.
+4. **Consume** – your frontend fetches from any relay, verifies the signature in one function call.
+
+No backend needed for the free tier. No database. No API key.
+
+---
+
+## 📦 Features
+
+### Free Tier (available now)
+- BTC/USD price – 60‑second updates
+- Median aggregation from Binance, Kraken, Coinbase
+- Public relays only (no authentication)
+- Signature verification examples in JavaScript/TypeScript
+- Open‑source aggregation logic
+
+### Pro Tier (coming soon – paid in Bitcoin)
+- BTC/USD + EUR, GBP, JPY (derived from live forex)
+- 10‑second updates
+- Webhooks (10k/month)
+- Priority support
+- **Payment:** 15,000 sats/month via Lightning
+- **Authentication:** domain‑bound short‑lived tokens (no user signing required)
+
+### Enterprise (custom)
+- Dedicated relay endpoint
+- Private relay infrastructure
+- Custom currency pairs
+- SLA & phone support
+- Optional self‑hosted signer
+
+## Using the free feed in your frontend
+
+1. Choose any Nostr relay that stores PriceStr events (e.g., wss://relay.damus.io, wss://relay.primal.net, or our relay wss://relay.pricestr.xyz).
+2. Subscribe to events from PriceStr’s pubkey with kind 30078.
+3. Verify the signature using nostr-tools or any Nostr library.
+4. Read the price from the content field or the price tag.
+
+```js
+import { Relay, verifyEvent } from 'nostr-tools';
+
+const relay = await Relay.connect('wss://relay.pricestr.xyz');
+await relay.connect();
+
+const sub = relay.sub([
+    { 
+        kinds: [30078], 
+        authors: [PRICESTR_PUBKEY], 
+        "#t": [`pricestr/free`]
+    }
+]);
+
+sub.on('event', event => {
+  if (verifyEvent(event)) {
+    const price = JSON.parse(event.content).aggregate;
+    console.log(`BTC/USD: $${price}`);
+  } else {
+    console.warn('Invalid signature – discarding');
+  }
+});
+```
+
+That’s it. No API key, no backend, no database.
+
+💰 Pro Tier access pattern (for developers)
+
+Pro subscribers get:
+- A dedicated relay endpoint (e.g., wss://relay.pricestr.xyz)
+- Faster updates (10 seconds)
+- Additional pairs (ETH, EUR, etc.)
+- Webhooks
+
+Because the dedicated relay requires authentication, we use **NIP-42** – the Nostr Authentication protocol.
+
+For a **static frontend** (HTML/JS on IPFS or a CDN) to access the Pro feed without embedding secrets, you have two clean options:
+
+### Option A: Pure client‑side (recommended for Nostr‑native apps)
+- Your frontend connects directly to `wss://relay.pricestr.xyz`.
+- The relay sends an AUTH challenge.
+- The user’s Nostr browser extension (Alby, Nos2x, etc.) signs the challenge with their own private key.
+- The relay verifies the signature and allows subscription – **no backend at all**.
+
+### Option B: Static frontend + your own lightweight backend (for non‑Nostr users)
+- You run a tiny backend (Node.js, Cloudflare Worker, etc.) that:
+  - Maintains a single NIP‑42 authenticated session with our Pro relay.
+  - Listens for price events over WebSocket.
+  - Forwards those events to your static frontend (via your own WebSocket or SSE).
+- Your frontend remains completely static – no API keys, no extension required.
+- The backend has no database; it just re‑broadcasts the already‑signed PriceStr events.
+
+For truly serverless static sites without any backend, the free tier remains the best fit. Pro requires either a Nostr extension (cheap) or a minimal backend (one line of code).
+
+## License
+
+The following components are open source (MIT license):
+- Price aggregation logic (fetching from exchange APIs, median calculation)
+- Nostr event schema and tagging conventions
+- Signature verification examples and SDK stubs
+- Relay integration helpers
+
+The production signer, webhook delivery engine closed source to protect our infrastructure and paid features. \
+Commercial use of the Pro/Enterprise relay endpoints requires a paid subscription. \
+For enterprise inquiries or custom deployments, email pricestr@hexquarter.com.
+
+
+
+
+
+
+
