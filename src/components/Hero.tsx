@@ -90,9 +90,6 @@ const Hero = () => {
             <span className="py-1.5 px-3 text-[10px] font-mono uppercase tracking-widest rounded-full border border-primary/20 text-primary/80">
               Lightning native
             </span>
-            <span className="py-1.5 px-3 text-[10px] font-mono uppercase tracking-widest rounded-full border border-violet-400/20 text-violet-400/80">
-              NIP-78
-            </span>
           </div>
         </div>
 
