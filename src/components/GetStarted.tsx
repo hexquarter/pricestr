@@ -6,7 +6,6 @@ import { SectionHeader } from "./SectionHeader";
 import { useRelay } from "@/hooks/use-relay";
 import { Relay } from "nostr-tools";
 
-// export default GetStarted;
 const GetStarted = () => {
 
   const { relay } = useRelay()
@@ -28,11 +27,6 @@ const GetStarted = () => {
   const handleRun = async () => {
     if (!relayPub) return
     const relay = await Relay.connect(import.meta.env.DEV ? 'ws://localhost:7777' : 'wss://relay.pricestr.xyz');
-    console.log([
-      {
-        kinds: [30078],
-        "#t": ['pricestr/free']
-      }])
     relay.subscribe([
       {
         kinds: [30078],
@@ -87,7 +81,6 @@ const GetStarted = () => {
 const relay = await Relay.connect('wss://relay.pricestr.xyz');
 relay.subscribe([{
   kinds: [30078],
-  authors: ['${relayPub}'],
   "#t": ['pricestr/free']
 }], {
   onevent(event) {
