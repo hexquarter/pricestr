@@ -1,59 +1,57 @@
-import { Activity, AppWindow, Lock, Network, Shrink } from "lucide-react";
-import { SectionHeader } from "./SectionHeader";
+import { Activity, AppWindow, Lock, Network, Shrink, ChevronRight } from "lucide-react";
+import { SectionHead } from "./SectionHead";
+
+const stages = [
+  { icon: Activity, n: "01", title: "Exchange APIs", lines: ["Binance", "Kraken", "Coinbase"] },
+  { icon: Shrink, n: "02", title: "Aggregation", lines: ["Median filter", "Open-source logic", "Isolated signer"] },
+  { icon: Lock, n: "03", title: "Signed event", lines: ["Nostr event", "Immutable ID", "Tamper-proof"] },
+  { icon: Network, n: "04", title: "Relay", lines: ["wss://pricestr.xyz", "Any public relay", "Dedicated for Pro+"] },
+  { icon: AppWindow, n: "05", title: "Your app", lines: ["Query any relay", "Verify signature", "Use price"] },
+];
 
 const SignalChain = () => (
-    <section className="">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col gap-10">
-            <SectionHeader title="Data pipeline" />
-            <header className="flex justify-between items-center gap-5">
-                <h2 className="text-7xl tracking-tight mb-6 font-[900] font-title uppercase">
-                    Signal <br /><span className="text-violet-400">Chain</span>
-                </h2>
-            </header>
-            <div className="grid md:grid-cols-5 relative z-10">
-                <div className="border border-border/10 p-5 flex flex-col gap-5">
-                    <div className="flex justify-between items-center">
-                        <Activity className="text-primary" />
-                        <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">01</p>
-                    </div>
-                    <h3 className="tracking-tight font-[900] font-title uppercase text-4xl">Exchange APIs</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">Binance <br /> Kraken<br /> Coinbase</p>
-                </div>
-                <div className="border border-border/10 border-l-0 p-5 flex flex-col gap-5">
-                    <div className="flex justify-between items-center">
-                        <Shrink className="text-primary" />
-                        <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">02</p>
-                    </div>
-                    <h3 className="tracking-tight font-[900] font-title uppercase text-4xl">Aggregation</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">Median filter <br />Open‑source logic <br />Isolated signer</p>
-                </div>
-                <div className="border border-border/10 border-l-0 p-5 flex flex-col gap-5">
-                    <div className="flex justify-between items-center">
-                        <Lock className="text-primary" />
-                        <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">03</p>
-                    </div>
-                    <h3 className="tracking-tight font-[900] font-title uppercase text-4xl flex items-center"> Signed Event</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">Nostr event  <br />Immutable ID <br />Tamper‑proof</p>
-                </div>
-                <div className="border border-border/10 p-5 border-l-0 flex flex-col gap-5">
-                    <div className="flex justify-between items-center">
-                        <Network className="text-primary" />
-                        <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">04</p>
-                    </div>
-                    <h3 className="tracking-tight font-[900] font-title uppercase text-4xl">Relay</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">wss://pricestr.xyz <br />Any public relay <br />Dedicated for Pro+</p>
-                </div>
-                <div className="border border-border/10 p-5 border-l-0 flex flex-col gap-5">
-                    <div className="flex justify-between items-center">
-                        <AppWindow className="text-primary" />
-                        <p className="text-4xl tracking-tight font-[900] font-title uppercase text-white/10">05</p>
-                    </div>
-                    <h3 className="tracking-tight font-[900] font-title uppercase text-4xl">Your app</h3>
-                    <p className="leading-5 text-xs font-mono text-muted-foreground">Query any relay <br />Verify signature <br />Use price</p>
-                </div>
+  <section id="pipeline" className="scroll-mt-24">
+    <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
+      <SectionHead
+        eyebrow="Data pipeline"
+        title={
+          <>
+            Signal <br />
+            <span className="text-violet-400">chain</span>
+          </>
+        }
+        lead="From raw exchange tick to verified Nostr event in your application — every hop is auditable."
+      />
+
+      <div className="grid md:grid-cols-5 border border-border/40 relative">
+        {stages.map((s, i) => {
+          const Icon = s.icon;
+          return (
+            <div
+              key={s.n}
+              className={`p-6 flex flex-col gap-5 relative ${
+                i > 0 ? "md:border-l border-border/40 border-t md:border-t-0" : ""
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                <Icon className="text-primary h-5 w-5" />
+                <p className="text-3xl tracking-tight font-[900] font-title uppercase text-foreground/10">{s.n}</p>
+              </div>
+              <h3 className="tracking-tight font-[900] font-title uppercase text-2xl leading-tight">{s.title}</h3>
+              <div className="flex flex-col gap-1 text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+                {s.lines.map((l) => (
+                  <span key={l}>· {l}</span>
+                ))}
+              </div>
+              {i < stages.length - 1 && (
+                <ChevronRight className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/60 bg-background" />
+              )}
             </div>
-        </div>
-    </section>
+          );
+        })}
+      </div>
+    </div>
+  </section>
 );
 
 export default SignalChain;
