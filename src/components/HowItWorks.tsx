@@ -1,31 +1,52 @@
 import ProofModel from "./ProofModel";
-import { SectionHeader } from "./SectionHeader";
+import { SectionHead } from "./SectionHead";
+
+const steps = [
+  {
+    n: "01",
+    title: "Aggregated",
+    body:
+      "Price data is pulled from multiple exchange APIs each cycle. The median value eliminates outliers, spoofed ticks, and single-source manipulation. Every line of aggregation code is open source.",
+  },
+  {
+    n: "02",
+    title: "Signed",
+    body:
+      "Each price event is signed by PriceStr's Nostr keypair on an isolated signer. The signature is deterministic — any Nostr library verifies it in one function call.",
+  },
+  {
+    n: "03",
+    title: "Delivered",
+    body:
+      "The signed event is broadcast across the Nostr relay network. Your application queries any relay — it doesn't matter which one. The signature is the truth, not the relay.",
+  },
+];
 
 const HowItWorks = () => (
-  <section className="" id="how-it-works">
-    <div className="max-w-7xl mx-auto px-6 flex flex-col gap-10">
-      <SectionHeader title="Protocol" />
-      <header className="flex justify-between items-center gap-5">
-        <h2 className="text-7xl tracking-tight mb-6 font-[900] font-title uppercase text-primary-500">
-          How it <br /><span className="text-violet-400">works</span>
-        </h2>
-      </header>
-      <div className="grid md:grid-cols-3">
-        <div className="border border-white/10 p-5 flex flex-col gap-5">
-          <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">01</p>
-          <h3 className="tracking-tight font-[900] font-title uppercase text-4xl text-primary">Aggregated</h3>
-          <p className="leading-5 text-xs font-mono text-muted-foreground">Price data is pulled from multiple exchange APIs each cycle. The median value is computed to eliminate outliers, spoofed ticks, and single‑source manipulation. All aggregation code is open source – you can audit every line.</p>
-        </div>
-        <div className="border border-white/10 border-l-0 p-5 flex flex-col gap-5">
-          <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">02</p>
-          <h3 className="tracking-tight font-[900] font-title uppercase text-4xl text-primary">Signed</h3>
-          <p className="leading-5 text-xs font-mono text-muted-foreground">Each price event is signed by PriceStr’s Nostr keypair on a secure, isolated server (hardware not required for verification). The signature is deterministic – any Nostr library can verify it in one function call.</p>
-        </div>
-        <div className="border border-white/10 border-l-0 p-5 flex flex-col gap-5">
-          <p className="text-7xl tracking-tight font-[900] font-title uppercase text-gray-500/20">03</p>
-          <h3 className="tracking-tight font-[900] font-title uppercase text-4xl text-primary">Delivered</h3>
-          <p className="leading-5 text-xs font-mono text-muted-foreground">The signed event is broadcast across the Nostr relay network. Your application queries any relay – it doesn’t matter which one. The signature is the truth, not the relay.</p>
-        </div>
+  <section id="how-it-works" className="scroll-mt-24">
+    <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
+      <SectionHead
+        eyebrow="Protocol"
+        title={
+          <>
+            How it <br />
+            <span className="text-violet-400">works</span>
+          </>
+        }
+        lead="A three-step pipeline turning noisy exchange data into a single cryptographically-signed price event, distributed over open relays."
+      />
+
+      <div className="grid md:grid-cols-3 border border-border/40">
+        {steps.map((s, i) => (
+          <div
+            key={s.n}
+            className={`p-8 flex flex-col gap-5 ${i > 0 ? "md:border-l border-border/40 border-t md:border-t-0" : ""}`}
+          >
+            <p className="text-6xl tracking-tight font-[900] font-title uppercase text-foreground/10">{s.n}</p>
+            <h3 className="tracking-tight font-[900] font-title uppercase text-3xl text-primary">{s.title}</h3>
+            <p className="leading-relaxed text-sm font-mono text-muted-foreground">{s.body}</p>
+          </div>
+        ))}
       </div>
 
       <ProofModel />
