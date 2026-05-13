@@ -380,40 +380,149 @@ subscribe();`
           </>
         }
         {subscription?.active &&
-          <>
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
-              <span className="text-violet-400">Active until: {new Date(subscription.expiresAt).toLocaleDateString()}</span>
-            </div>
-
-            <p>Usage</p>
-
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between text-[10px] uppercase text-muted-foreground text-xs">
-                <button
-                  onClick={() => copy(snippetUsage, "Snippet")}
-                  className="flex items-center gap-1 hover:text-violet-400"
-                >
-                  <Copy className="h-3 w-3" /> copy
-                </button>
-              </div>
-              <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0A0A0A] shadow-2xl">
-                <div className="p-4">
-                  <pre className="overflow-x-auto text-xs leading-[2] text-white/80">
-                    <code>{snippetUsage}</code>
-                  </pre>
+          (() => {
+            const expires = new Date(subscription.expiresAt);
+            const daysLeft = Math.max(0, Math.ceil((subscription.expiresAt - Date.now()) / 86_400_000));
+            const streaming = !!stream;
+            const stopStream = () => {
+              if (stream) { stream.close(); setStream(undefined); }
+            };
+            return (
+              <div className="flex flex-col gap-5 pt-2">
+                {/* Status header */}
+                <div className="grid grid-cols-3 gap-px bg-white/5 border border-white/10">
+                  <div className="bg-[#0A0A14] p-3 flex flex-col gap-1">
+                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                      <ShieldCheck className="h-3 w-3" /> Status
+                    </span>
+                    <span className="flex items-center gap-2 text-xs text-violet-400">
+                      <span className="relative flex h-2 w-2">
+                        <span className="absolute inset-0 rounded-full bg-violet-400 animate-ping opacity-75" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
+                      </span>
+                      Active
+                    </span>
+                  </div>
+                  <div className="bg-[#0A0A14] p-3 flex flex-col gap-1">
+                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                      <Calendar className="h-3 w-3" /> Expires
+                    </span>
+                    <span className="text-xs text-white/90">{expires.toLocaleDateString()}</span>
+                    <span className="text-[10px] text-muted-foreground">{daysLeft}d remaining</span>
+                  </div>
+                  <div className="bg-[#0A0A14] p-3 flex flex-col gap-1">
+                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                      <Activity className="h-3 w-3" /> Events
+                    </span>
+                    <span className="text-xs text-white/90">{runResult.length}</span>
+                    <span className="text-[10px] text-muted-foreground">{streaming ? "streaming…" : "idle"}</span>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  {runResult.length == 0 && <Button onClick={handleRun}>Stream prices <PlayIcon /></Button>}
+
+                {/* Identity */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Identity</span>
+                  <div className="flex items-center justify-between gap-2 border border-white/10 bg-white/5 px-3 py-2">
+                    <code className="truncate text-[11px] text-white/80">{npub}</code>
+                    <button
+                      onClick={() => copy(npub, "npub")}
+                      className="text-muted-foreground hover:text-violet-400 shrink-0"
+                      aria-label="Copy npub"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
-                {runResult.map((r, i) => <div key={i} className={`flex flex-col bg-white/10 align-middle p-3 text-xs w-full border-b border-border`}>
-                  <p><span className=" text-primary">Content:</span> {r.content}</p>
-                  <p><span className=" text-primary">Issued at:</span> {new Date(r.created_at * 1000).toLocaleTimeString()} - Next in 10s</p>
 
-                </div>)}
+                {/* Snippet */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Usage · Premium feed</span>
+                  <div className="overflow-hidden rounded-md border border-white/10 bg-[#07070C]">
+                    <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
+                      <span className="flex items-center gap-2 text-[10px] font-mono text-white/50">
+                        <Terminal className="h-3 w-3" /> subscribe.ts
+                      </span>
+                      <button
+                        onClick={() => copy(snippetUsage, "Snippet")}
+                        className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-white/50 hover:text-violet-400"
+                      >
+                        <Copy className="h-3 w-3" /> copy
+                      </button>
+                    </div>
+                    <pre className="overflow-x-auto p-4 text-[11px] leading-[1.7] text-white/80">
+                      <code>{snippetUsage}</code>
+                    </pre>
+                  </div>
+                </div>
+
+                {/* Live stream */}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                      <Radio className="h-3 w-3" /> Live stream
+                    </span>
+                    {streaming ? (
+                      <button
+                        onClick={stopStream}
+                        className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary"
+                      >
+                        <Square className="h-3 w-3" /> stop
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleRun}
+                        className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-violet-400 hover:text-violet-300"
+                      >
+                        <PlayIcon className="h-3 w-3" /> stream prices
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="border border-white/10 bg-[#07070C] divide-y divide-white/5 min-h-[120px]">
+                    {runResult.length === 0 ? (
+                      <div className="flex items-center justify-center p-8 text-[11px] font-mono text-muted-foreground">
+                        {streaming ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-3 w-3 animate-spin" /> waiting for next signed event…
+                          </span>
+                        ) : (
+                          <span>// press "stream prices" to start</span>
+                        )}
+                      </div>
+                    ) : (
+                      runResult.map((r, i) => {
+                        let parsed: any = null;
+                        try { parsed = JSON.parse(r.content); } catch { /* keep raw */ }
+                        return (
+                          <div key={r.id || i} className="flex items-start gap-3 p-3 text-[11px] font-mono hover:bg-white/[0.02]">
+                            <span className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${i === 0 ? "bg-violet-400 animate-pulse" : "bg-white/20"}`} />
+                            <div className="flex-1 min-w-0 flex flex-col gap-1">
+                              <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                                <span>{new Date(r.created_at * 1000).toLocaleTimeString()}</span>
+                                <span className="text-white/30">next in 10s</span>
+                              </div>
+                              {parsed && typeof parsed === "object" ? (
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-white/85">
+                                  {Object.entries(parsed).slice(0, 6).map(([k, v]) => (
+                                    <span key={k}>
+                                      <span className="text-violet-400/80">{k}:</span>{" "}
+                                      <span className="text-white/90">{String(v)}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-white/85 break-all">{r.content}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </>
-
+            );
+          })()
         }
       </DialogContent>
     </Dialog>
