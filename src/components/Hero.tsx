@@ -75,7 +75,7 @@ const Hero = () => {
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild className="font-mono uppercase tracking-widest text-xs h-11 px-6">
               <Link to="#get-started">
-                View pubkey <ArrowRight className="ml-2 h-4 w-4" />
+                Start for free <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button variant="outline" asChild className="font-mono uppercase tracking-widest text-xs h-11 px-6">

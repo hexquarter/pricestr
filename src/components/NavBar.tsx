@@ -46,12 +46,6 @@ const NavBar = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a
-            href="#get-started"
-            className="hidden sm:inline-flex text-[11px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Docs
-          </a>
           <Button asChild size="sm" variant="outline" className="font-mono uppercase text-[11px] tracking-widest">
             <a href="#pricing">Subscribe</a>
           </Button>
