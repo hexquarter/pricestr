@@ -506,7 +506,15 @@ subscribe();`
                                   {Object.entries(parsed).slice(0, 6).map(([k, v]) => (
                                     <span key={k}>
                                       <span className="text-violet-400/80">{k}:</span>{" "}
-                                      <span className="text-white/90">{String(v)}</span>
+                                      <span className="text-white/90">
+                                        {Array.isArray(v)
+                                          ? v.join(", ")
+                                          : typeof v === "object" && v !== null
+                                            ? Object.entries(v)
+                                              .map(([key, val]) => `${key}: ${val}`)
+                                              .join(", ")
+                                            : String(v)}
+                                      </span>
                                     </span>
                                   ))}
                                 </div>

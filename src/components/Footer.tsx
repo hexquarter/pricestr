@@ -1,8 +1,8 @@
 const links = [
-  { label: "Docs", href: "#docs" },
+  // { label: "Docs", href: "#docs" },
   { label: "GitHub", href: "#github" },
-  { label: "Nostr pubkey", href: "#get-started" },
-  { label: "Status", href: "#status" },
+  // { label: "Nostr pubkey", href: "#get-started" },
+  // { label: "Status", href: "#status" },
 ];
 
 const Footer = () => (
@@ -35,11 +35,7 @@ const Footer = () => (
           Built for the Nostr ecosystem
         </p>
         <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70 flex items-center gap-2">
-          <span className="relative flex size-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-            <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
-          </span>
-          All systems operational
+          © {new Date().getFullYear()} By <a href="https://hexquarter.com" target="_blank" className="underline">HexQuarter</a>. All rights reserved.
         </p>
       </div>
     </div>
