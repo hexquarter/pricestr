@@ -493,7 +493,69 @@ subscribe();`
                   </div>
                 </div>
 
-                {/* Snippet */}
+                {/* Webhooks */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                      <Webhook className="h-3 w-3" /> Webhooks
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {webhooks.length} registered
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    Relay POSTs every signed price event to these endpoints. JSON body, retried with backoff.
+                  </p>
+
+                  <div className="flex gap-2">
+                    <Input
+                      value={webhookInput}
+                      onChange={(e) => setWebhookInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") registerWebhook() }}
+                      placeholder="https://your-app.com/hooks/pricestr"
+                      className="font-mono text-xs"
+                      disabled={webhookLoading}
+                    />
+                    <Button
+                      onClick={registerWebhook}
+                      disabled={webhookLoading || !webhookInput.trim()}
+                      variant="outline"
+                      className="font-mono uppercase text-[10px] shrink-0"
+                    >
+                      {webhookLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Plus className="h-3 w-3 mr-1" /> Add</>}
+                    </Button>
+                  </div>
+
+                  {webhooks.length > 0 && (
+                    <div className="border border-white/10 bg-[#07070C] divide-y divide-white/5">
+                      {webhooks.map((wh) => (
+                        <div key={wh.id} className="flex items-center justify-between gap-2 px-3 py-2 text-[11px] font-mono">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
+                            <code className="truncate text-white/80">{wh.url}</code>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => copy(wh.url, "URL")}
+                              className="text-muted-foreground hover:text-violet-400 p-1"
+                              aria-label="Copy URL"
+                            >
+                              <Copy className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => removeWebhook(wh.id)}
+                              className="text-muted-foreground hover:text-primary p-1"
+                              aria-label="Remove webhook"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex flex-col gap-1">
                   <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Usage · Premium feed</span>
                   <div className="overflow-hidden rounded-md border border-white/10 bg-[#07070C]">
