@@ -116,6 +116,57 @@ const SubscribeProModal = ({ open, onOpenChange }: Props) => {
   const { relay } = useRelay()
   const [relayPub, setRelayPub] = useState("")
   const [runResult, setRunResult] = useState<NostrEvent[]>([])
+  const [webhooks, setWebhooks] = useState<{ id: string; url: string; createdAt?: number }[]>([])
+  const [webhookInput, setWebhookInput] = useState("")
+  const [webhookLoading, setWebhookLoading] = useState(false)
+
+  const loadWebhooks = async (key: string) => {
+    try {
+      const r = await fetch(`${endpoint}/webhooks/${key}`)
+      if (!r.ok) return
+      const data = await r.json()
+      setWebhooks(Array.isArray(data) ? data : (data.webhooks ?? []))
+    } catch { /* ignore */ }
+  }
+
+  const registerWebhook = async () => {
+    const url = webhookInput.trim()
+    if (!url) return
+    try { new URL(url) } catch { toast.error("Invalid URL"); return }
+    if (!/^https?:\/\//.test(url)) { toast.error("URL must start with http(s)://"); return }
+    setWebhookLoading(true)
+    try {
+      const r = await fetch(`${endpoint}/webhooks/${npub}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      const created = await r.json().catch(() => ({ id: crypto.randomUUID(), url }))
+      setWebhooks((prev) => [...prev, { id: created.id ?? crypto.randomUUID(), url: created.url ?? url, createdAt: Date.now() }])
+      setWebhookInput("")
+      toast.success("Webhook registered")
+    } catch (e) {
+      const err = e as Error
+      toast.error(`Failed to register webhook: ${err.message}`)
+    } finally {
+      setWebhookLoading(false)
+    }
+  }
+
+  const removeWebhook = async (id: string) => {
+    const prev = webhooks
+    setWebhooks((w) => w.filter((x) => x.id !== id))
+    try {
+      const r = await fetch(`${endpoint}/webhooks/${npub}/${id}`, { method: "DELETE" })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      toast.success("Webhook removed")
+    } catch (e) {
+      setWebhooks(prev)
+      const err = e as Error
+      toast.error(`Failed to remove: ${err.message}`)
+    }
+  }
 
   useEffect(() => {
     if (!relay) return
