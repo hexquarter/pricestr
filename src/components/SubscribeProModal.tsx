@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { hexToBytes } from "nostr-tools/utils";
 import { bech32 } from "bech32";
 import { useRelay } from "@/hooks/use-relay";
-import { EventTemplate, NostrEvent, Relay, VerifiedEvent } from "nostr-tools";
+import { EventTemplate, nip98, NostrEvent, Relay, VerifiedEvent } from "nostr-tools";
 import { Subscription } from "nostr-tools/abstract-relay";
 
 declare global {
@@ -116,17 +116,17 @@ const SubscribeProModal = ({ open, onOpenChange }: Props) => {
   const { relay } = useRelay()
   const [relayPub, setRelayPub] = useState("")
   const [runResult, setRunResult] = useState<NostrEvent[]>([])
-  const [webhooks, setWebhooks] = useState<{ id: string; url: string; createdAt?: number }[]>([])
+  const [webhook, setWebhook] = useState<string>("")
   const [webhookInput, setWebhookInput] = useState("")
   const [webhookLoading, setWebhookLoading] = useState(false)
 
-  const loadWebhooks = async (key: string) => {
+  const loadWebhook = async (npub: string) => {
     try {
-      const r = await fetch(`${endpoint}/webhooks/${key}`)
+      const r = await fetch(`${endpoint}/webhook/${npub}`)
       if (!r.ok) return
       const data = await r.json()
-      setWebhooks(Array.isArray(data) ? data : (data.webhooks ?? []))
-    } catch { /* ignore */ }
+      setWebhook(data.webhook)
+    } catch { }
   }
 
   const registerWebhook = async () => {
@@ -135,15 +135,27 @@ const SubscribeProModal = ({ open, onOpenChange }: Props) => {
     try { new URL(url) } catch { toast.error("Invalid URL"); return }
     if (!/^https?:\/\//.test(url)) { toast.error("URL must start with http(s)://"); return }
     setWebhookLoading(true)
+
     try {
-      const r = await fetch(`${endpoint}/webhooks/${npub}`, {
+      if (!window.nostr) {
+        toast.error("No NIP-07 extension found (Alby, nos2x…)");
+        return;
+      }
+      const authToken = await nip98.getToken(`${endpoint}/webhook`, 'POST', async (e: any) => {
+        const signed = await window.nostr.signEvent(e);
+        return signed;
+      }, true, { url })
+
+      const r = await fetch(`${endpoint}/webhook`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": authToken
+        },
         body: JSON.stringify({ url }),
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
-      const created = await r.json().catch(() => ({ id: crypto.randomUUID(), url }))
-      setWebhooks((prev) => [...prev, { id: created.id ?? crypto.randomUUID(), url: created.url ?? url, createdAt: Date.now() }])
+      setWebhook(url)
       setWebhookInput("")
       toast.success("Webhook registered")
     } catch (e) {
@@ -154,15 +166,23 @@ const SubscribeProModal = ({ open, onOpenChange }: Props) => {
     }
   }
 
-  const removeWebhook = async (id: string) => {
-    const prev = webhooks
-    setWebhooks((w) => w.filter((x) => x.id !== id))
+  const removeWebhook = async () => {
     try {
-      const r = await fetch(`${endpoint}/webhooks/${npub}/${id}`, { method: "DELETE" })
+      const authToken = await nip98.getToken(`${endpoint}/webhook`, 'DELETE', async (e: any) => {
+        const signed = await window.nostr.signEvent(e);
+        return signed;
+      }, true)
+
+      const r = await fetch(`${endpoint}/webhook`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": authToken
+        }
+      })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       toast.success("Webhook removed")
+      setWebhook("")
     } catch (e) {
-      setWebhooks(prev)
       const err = e as Error
       toast.error(`Failed to remove: ${err.message}`)
     }
@@ -232,7 +252,7 @@ subscribe();`
 
   useEffect(() => {
     if (npub && (subscription?.active || paid)) {
-      loadWebhooks(npub)
+      loadWebhook(npub)
     }
   }, [npub, subscription?.active, paid])
 
@@ -242,7 +262,7 @@ subscribe();`
     setPaid(false);
     setLoading(false);
     setRunResult([])
-    setWebhooks([])
+    setWebhook("")
     setWebhookInput("")
     setErrorNpub("")
     setSubscription(undefined)
@@ -441,7 +461,7 @@ subscribe();`
         {subscription?.active &&
           (() => {
             const expires = new Date(subscription.expiresAt);
-            const daysLeft = Math.max(0, Math.ceil((subscription.expiresAt - Date.now()) / 86_400_000));
+            const daysLeft = Math.max(0, Math.ceil((expires.getTime() - Date.now()) / 86_400_000));
             const streaming = !!stream;
             const stopStream = () => {
               if (stream) { stream.close(); setStream(undefined); }
@@ -449,7 +469,7 @@ subscribe();`
             return (
               <div className="flex flex-col gap-5 pt-2">
                 {/* Status header */}
-                <div className="grid grid-cols-3 gap-px bg-white/5 border border-white/10">
+                <div className="grid grid-cols-2 gap-px bg-white/5 border border-white/10">
                   <div className="bg-[#0A0A14] p-3 flex flex-col gap-1">
                     <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
                       <ShieldCheck className="h-3 w-3" /> Status
@@ -469,13 +489,6 @@ subscribe();`
                     <span className="text-xs text-white/90">{expires.toLocaleDateString()}</span>
                     <span className="text-[10px] text-muted-foreground">{daysLeft}d remaining</span>
                   </div>
-                  <div className="bg-[#0A0A14] p-3 flex flex-col gap-1">
-                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                      <Activity className="h-3 w-3" /> Events
-                    </span>
-                    <span className="text-xs text-white/90">{runResult.length}</span>
-                    <span className="text-[10px] text-muted-foreground">{streaming ? "streaming…" : "idle"}</span>
-                  </div>
                 </div>
 
                 {/* Identity */}
@@ -493,21 +506,18 @@ subscribe();`
                   </div>
                 </div>
 
-                {/* Webhooks */}
+                {/* Webhook */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                      <Webhook className="h-3 w-3" /> Webhooks
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      {webhooks.length} registered
+                      <Webhook className="h-3 w-3" /> Webhook
                     </span>
                   </div>
                   <p className="text-[10px] text-muted-foreground">
-                    Relay POSTs every signed price event to these endpoints. JSON body, retried with backoff.
+                    Relay POSTs every signed price event to these endpoints.
                   </p>
 
-                  <div className="flex gap-2">
+                  {!webhook && <div className="flex gap-2">
                     <Input
                       value={webhookInput}
                       onChange={(e) => setWebhookInput(e.target.value)}
@@ -522,36 +532,34 @@ subscribe();`
                       variant="outline"
                       className="font-mono uppercase text-[10px] shrink-0"
                     >
-                      {webhookLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Plus className="h-3 w-3 mr-1" /> Add</>}
+                      {webhookLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <>Register</>}
                     </Button>
-                  </div>
+                  </div>}
 
-                  {webhooks.length > 0 && (
+                  {webhook && (
                     <div className="border border-white/10 bg-[#07070C] divide-y divide-white/5">
-                      {webhooks.map((wh) => (
-                        <div key={wh.id} className="flex items-center justify-between gap-2 px-3 py-2 text-[11px] font-mono">
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
-                            <code className="truncate text-white/80">{wh.url}</code>
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              onClick={() => copy(wh.url, "URL")}
-                              className="text-muted-foreground hover:text-violet-400 p-1"
-                              aria-label="Copy URL"
-                            >
-                              <Copy className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => removeWebhook(wh.id)}
-                              className="text-muted-foreground hover:text-primary p-1"
-                              aria-label="Remove webhook"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
+                      <div className="flex items-center justify-between gap-2 px-3 py-2 text-[11px] font-mono">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
+                          <code className="truncate text-white/80">{webhook}</code>
                         </div>
-                      ))}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => copy(webhook, "URL")}
+                            className="text-muted-foreground hover:text-violet-400 p-1"
+                            aria-label="Copy URL"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={() => removeWebhook()}
+                            className="text-muted-foreground hover:text-primary p-1"
+                            aria-label="Remove webhook"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
