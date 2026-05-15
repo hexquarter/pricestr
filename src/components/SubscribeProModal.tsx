@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Copy, Loader2, Zap, KeyRound, Puzzle, Check, PlayIcon, Terminal, Radio, Square, Calendar, Activity, ShieldCheck } from "lucide-react";
+import { Copy, Loader2, Zap, KeyRound, Puzzle, Check, PlayIcon, Terminal, Radio, Square, Calendar, Activity, ShieldCheck, Webhook, Trash2, Plus } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import { hexToBytes } from "nostr-tools/utils";
