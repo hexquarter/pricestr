@@ -230,6 +230,12 @@ subscribe();`
     }
   }, [payment])
 
+  useEffect(() => {
+    if (npub && (subscription?.active || paid)) {
+      loadWebhooks(npub)
+    }
+  }, [npub, subscription?.active, paid])
+
   const reset = () => {
     setNpub("");
     setPayment(null);
