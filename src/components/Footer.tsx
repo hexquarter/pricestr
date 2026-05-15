@@ -1,8 +1,7 @@
 const links = [
-  // { label: "Docs", href: "#docs" },
-  { label: "GitHub", href: "#github" },
-  // { label: "Nostr pubkey", href: "#get-started" },
-  // { label: "Status", href: "#status" },
+  { label: "Docs", href: "/docs" },
+  { label: "GitHub", href: "https://github.com" },
+  { label: "Pubkey", href: "/#get-started" },
 ];
 
 const Footer = () => (
