@@ -236,6 +236,8 @@ subscribe();`
     setPaid(false);
     setLoading(false);
     setRunResult([])
+    setWebhooks([])
+    setWebhookInput("")
     setErrorNpub("")
     setSubscription(undefined)
     if (stream) {
