@@ -8,6 +8,7 @@ const links = [
   { label: "Pipeline", href: "#pipeline" },
   { label: "Pricing", href: "#pricing" },
   { label: "Integrate", href: "#get-started" },
+  { label: "Docs", href: "/docs" },
 ];
 
 const NavBar = () => {
