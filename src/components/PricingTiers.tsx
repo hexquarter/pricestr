@@ -106,7 +106,6 @@ const PricingTiers = () => {
             </div>
           ))}
         </div>
-      </div>
         <div className="grid md:grid-cols-3 border border-border/40 mt-2">
           {[
             { k: "Payment", v: "Lightning · sats", sub: "Pay the BOLT11 invoice from any Lightning wallet. No fiat rails, no chargebacks." },
