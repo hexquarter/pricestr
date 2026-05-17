@@ -20,7 +20,7 @@ const SignalChain = () => (
             <span className="text-violet-400">chain</span>
           </>
         }
-        lead="From raw exchange tick to verified Nostr event in your application — every hop is auditable."
+        lead="From a raw exchange tick to a verified Nostr event running inside your application. Every hop is open-source, auditable, and replaceable — there is no proprietary middle box anywhere in this pipeline."
       />
 
       <div className="grid md:grid-cols-5 border border-border/40 relative">
