@@ -231,6 +231,9 @@ subscribe();`
         const { active, expiresAt } = await r.json()
         setSubscription({ active, expiresAt })
       })
+      .catch(() => {
+         toast.error("We cannot retrieve subscription data. Please to retry later. If the problem persist, you can contact pricestr@hexquarter.com");
+      })
   }, [npub])
 
   useEffect(() => {
