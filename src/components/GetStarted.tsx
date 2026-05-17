@@ -58,7 +58,7 @@ const GetStarted = () => {
               <span className="text-violet-400">Nostr</span>
             </>
           }
-          lead="Two pieces of information are all you need: the relay URL and the signer's public key."
+          lead="Two pieces of information are all you ever need: the relay URL and the signer's public key. Drop them into any Nostr client, in any language, and you have a live, verifiable Bitcoin price feed in production in under a minute."
         />
 
         <div className="grid lg:grid-cols-12 gap-px bg-border/40 border border-border/40">
@@ -102,6 +102,15 @@ const GetStarted = () => {
               Add this pubkey to your relay subscriptions. Every signed price event will appear in
               your feed. The signature is the truth — not the relay.
             </p>
+
+            <div className="border-t border-border/40 pt-5 flex flex-col gap-3">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-primary">// integration notes</p>
+              <ul className="flex flex-col gap-2 text-xs font-mono text-muted-foreground leading-relaxed">
+                <li>· Works with <span className="text-foreground">nostr-tools</span>, <span className="text-foreground">NDK</span>, <span className="text-foreground">rust-nostr</span>, and any NIP-01 client.</li>
+                <li>· Verify <span className="text-foreground">event.pubkey</span> matches the signer key above before trusting any price.</li>
+                <li>· Backfill missed events with a <span className="text-foreground">since</span> filter — relays keep full history.</li>
+              </ul>
+            </div>
           </div>
 
           {/* Right: code */}

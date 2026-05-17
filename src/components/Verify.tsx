@@ -5,19 +5,19 @@ const proofs = [
     n: "01",
     title: "Relay-agnostic truth",
     body:
-      "The cryptographic signature binds the price to PriceStr's public key. Any relay delivering that event is verifiable; none can censor or alter it without breaking the signature.",
+      "The Schnorr signature binds the price payload to PriceStr's published public key. Any relay can deliver the event, none can rewrite it. A malicious relay operator cannot forge a price without producing a signature they do not have the key to compute.",
   },
   {
     n: "02",
-    title: "Permanent history",
+    title: "Permanent, replayable history",
     body:
-      "Every event is permanently addressable by its ID. Relays store a full, queryable price history. No database required — Nostr is your database.",
+      "Every event is permanently addressable by its event ID. Relays store a full queryable history; subscribers can backfill from any point in time. There is no proprietary database, no admin console, no closed-source endpoint between you and the price.",
   },
   {
     n: "03",
     title: "One function call",
     body:
-      "Any Nostr library exposes verify(). Pass the event and the public key. Boolean result. No API keys, no trust boundary, no vendor lock-in.",
+      "Verification is verifyEvent(event) in any Nostr library — in TypeScript, Rust, Go, Python, Swift, or Kotlin. Boolean result, no handshake, no nonce, no clock dependency. The check runs locally in microseconds, on-device or in your edge function.",
   },
 ];
 
@@ -50,7 +50,7 @@ const Verify = () => (
             <span className="text-violet-400">everything</span>
           </>
         }
-        lead="Nothing about the price feed requires trust in PriceStr's infrastructure. The event itself is the proof."
+        lead="Nothing about the price feed requires trust in PriceStr's infrastructure. The signature is computed once at the source and travels with the data — across any relay, any cache, any peer. The event itself is the proof."
       />
 
       <div className="grid lg:grid-cols-2 border border-border/40">
@@ -101,6 +101,12 @@ const Verify = () => (
                 </div>
               </div>
             ))}
+          </div>
+          <div className="border-t border-border/40 pt-6 mt-2 flex flex-col gap-2">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">// bottom line</p>
+            <p className="text-sm font-mono text-muted-foreground leading-relaxed">
+              The price you read is the price PriceStr signed. Not the price our server returned, not the price our CDN cached, not the price our database happened to hold. The signature collapses every intermediate trust hop into one local check.
+            </p>
           </div>
         </div>
       </div>
