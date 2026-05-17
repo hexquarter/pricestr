@@ -19,7 +19,7 @@ const tiers = [
     price: "$15",
     period: "/ month",
     blurb: "For trading UIs, fintech products, and production workloads. Faster cadence, multi-currency, and authenticated relay access.",
-    features: ["BTC/USD + EUR / GBP / JPY", "10-second updates", "Webhooks · 10k / month", "NIP-42 premium relay", "Email + Nostr DM support"],
+    features: ["BTC/USD + forex rates", "10-second updates", "Webhooks", "NIP-42 premium relay"],
     cta: { label: "Subscribe", variant: "default" as const, href: "#subscribe-pro" },
     highlight: true,
   },
