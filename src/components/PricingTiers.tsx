@@ -62,7 +62,7 @@ const PricingTiers = () => {
             >
               {t.highlight && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-mono uppercase tracking-widest bg-violet-400 text-background px-3 py-1 rounded-full">
-                  Most popular
+                  Production-ready
                 </div>
               )}
               <header className="flex flex-col gap-3 p-6 border-b border-border/40">

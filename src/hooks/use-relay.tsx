@@ -52,10 +52,10 @@ class PricestrRelay {
         return relayInfo
     }
 
-    async subscribePrice(tier: 'free' | 'premium', callback: (priceData: PriceData) => void) {
+    async subscribePremium(callback: (priceData: PriceData) => void) {
         const sub = () => this.relay.subscribe([{
             kinds: [30078],
-            "#t": [`pricestr/${tier}`]
+            "#t": [`pricestr/pro`]
         }], {
             onclose(e) {
                 if (e == 'auth-required') {

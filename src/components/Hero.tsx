@@ -3,27 +3,39 @@ import { Button } from "./ui/button";
 import { Line, LineChart, YAxis, CartesianGrid } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
 import { Link } from "react-router-dom";
-import { useRelay, PriceData } from "@/hooks/use-relay";
+import { PriceData } from "@/hooks/use-relay";
 import { ArrowRight } from "lucide-react";
+import { SimplePool } from "nostr-tools";
+
+const FREE_RELAIS = [
+  'wss://relay.nostrcheck.me',
+  'wss://relay.nostriches.club',
+  'wss://nos.lol',
+  'wss://relay.damus.io',
+  'wss://relay.primal.net'
+]
 
 const Hero = () => {
-  const { relay } = useRelay();
-
   const [chartData, setChartData] = useState<PriceData[]>([]);
   const [changePrices, setChangePrices] = useState<number[]>([]);
   const chartConfig = {} satisfies ChartConfig;
 
   useEffect(() => {
-    if (relay) {
-      relay.subscribePrice("free", (data) => {
+    const pool = new SimplePool()
+    pool.subscribe(FREE_RELAIS, {
+      kinds: [30078],
+      "#t": [`pricestr/free`]
+    }, {
+      onevent({ content }) {
+        const data = JSON.parse(content);
         setChartData((prev) => [...prev, data].slice(-60));
         setChangePrices((prev) => {
           if (prev.length === 0) return [data.median];
           return [data.median, prev[0]];
         });
-      });
-    }
-  }, [relay]);
+      }
+    })
+  }, []);
 
   const hasData = chartData.length > 0;
   const last = changePrices[0];
@@ -126,7 +138,7 @@ const Hero = () => {
                       type="natural"
                       stroke={source === "binance" ? "#ffdd00" : source === "coinbase" ? "#0059ff" : "#6532b7"}
                       dot={false}
-                      opacity={0.25}
+                      opacity={0.5}
                       strokeWidth={1}
                       name={source}
                     />
@@ -134,7 +146,7 @@ const Hero = () => {
                 <Line
                   dataKey="median"
                   type="natural"
-                  stroke="hsl(var(--primary))"
+                  stroke="#ddd"
                   strokeWidth={2}
                   dot={false}
                   isAnimationActive={!hasData}
@@ -173,26 +185,25 @@ const Hero = () => {
               <div className="flex flex-col gap-1.5 mt-1">
                 {hasData
                   ? Object.entries(chartData[chartData.length - 1].sources).map(([source, price]) => (
-                      <div key={source} className="text-[11px] uppercase tracking-wider flex items-center justify-between gap-2 text-muted-foreground">
-                        <span className="flex items-center gap-2">
-                          <div
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              source === "binance" ? "bg-yellow-400" : source === "coinbase" ? "bg-blue-500" : "bg-violet-400"
+                    <div key={source} className="text-[11px] uppercase tracking-wider flex items-center justify-between gap-2 text-muted-foreground">
+                      <span className="flex items-center gap-2">
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full ${source === "binance" ? "bg-yellow-400" : source === "coinbase" ? "bg-blue-500" : "bg-violet-400"
                             }`}
-                          />
-                          {source}
-                        </span>
-                        <span className="text-foreground/80">
-                          {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(price)}
-                        </span>
-                      </div>
-                    ))
+                        />
+                        {source}
+                      </span>
+                      <span className="text-foreground/80">
+                        {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(price)}
+                      </span>
+                    </div>
+                  ))
                   : ["binance", "coinbase", "kraken"].map((s) => (
-                      <div key={s} className="text-[11px] uppercase tracking-wider flex items-center gap-2 text-muted-foreground/40">
-                        <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
-                        {s}
-                      </div>
-                    ))}
+                    <div key={s} className="text-[11px] uppercase tracking-wider flex items-center gap-2 text-muted-foreground/40">
+                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+                      {s}
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
