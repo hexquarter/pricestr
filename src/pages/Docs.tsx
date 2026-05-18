@@ -189,13 +189,12 @@ const Docs = () => (
   "created_at": 1714823944,
   "tags": [
     ["sources", "kraken,binance,coinbase"],
-    ["method",  "median"],
     ["currency","USD"],
     ["tier",    "free"],
     ["d",       "pricestr/free/1714823944"],
     ["t",       "pricestr/free"]
   ],
-  "content": "{\\"aggregate\\":70040,\\"sources\\":{...}}",
+  "content": "{\\"median\\":70040,\\"sources\\":{...}}",
   "sig": "a8f31c9e…04"
 }`}</Code>
               <p>
@@ -218,8 +217,8 @@ if (!ok) throw new Error('Tampered or forged event');
 // Optional: ensure the event was signed by PriceStr
 if (event.pubkey !== PRICESTR_PUBKEY) throw new Error('Wrong signer');
 
-const { aggregate } = JSON.parse(event.content);
-console.log('BTC/USD =', aggregate);`}</Code>
+const { median } = JSON.parse(event.content);
+console.log('BTC/USD =', median);`}</Code>
               <p>
                 Always check the <code>pubkey</code> matches PriceStr's published key. A valid
                 signature only proves <em>some</em> key signed the event — pinning the expected
@@ -242,8 +241,8 @@ relay.subscribe([{
   "#t": ['pricestr/free']
 }], {
   onevent(event) {
-    const { aggregate } = JSON.parse(event.content);
-    console.log('BTC/USD =', aggregate);
+    const { median } = JSON.parse(event.content);
+    console.log('BTC/USD =', median);
   }
 });`}</Code>
               <p>

@@ -18,8 +18,8 @@ const Hero = () => {
       relay.subscribePrice("free", (data) => {
         setChartData((prev) => [...prev, data].slice(-60));
         setChangePrices((prev) => {
-          if (prev.length === 0) return [data.aggregate];
-          return [data.aggregate, prev[0]];
+          if (prev.length === 0) return [data.median];
+          return [data.median, prev[0]];
         });
       });
     }
@@ -32,7 +32,7 @@ const Hero = () => {
 
   // Fallback skeleton data so the chart never looks empty
   const skeletonData = Array.from({ length: 30 }, (_, i) => ({
-    aggregate: 70000 + Math.sin(i / 3) * 80 + Math.cos(i / 5) * 40,
+    median: 70000 + Math.sin(i / 3) * 80 + Math.cos(i / 5) * 40,
   }));
 
   return (
@@ -132,7 +132,7 @@ const Hero = () => {
                     />
                   ))}
                 <Line
-                  dataKey="aggregate"
+                  dataKey="median"
                   type="natural"
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}

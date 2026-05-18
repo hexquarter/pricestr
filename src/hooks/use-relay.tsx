@@ -5,9 +5,8 @@ import type { ReactNode } from 'react';
 
 export type PriceData = {
     timestamp: number;
-    aggregate: number;
+    median: number;
     sources: Record<string, number>;
-    method: string;
 };
 
 export interface RelayContextType {
