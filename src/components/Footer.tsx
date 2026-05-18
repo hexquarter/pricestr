@@ -1,6 +1,5 @@
 const links = [
   { label: "Docs", href: "/docs" },
-  { label: "GitHub", href: "https://github.com" },
   { label: "Pubkey", href: "/#get-started" },
 ];
 
