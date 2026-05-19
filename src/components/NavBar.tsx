@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 
 const links = [
-  { label: "Protocol", href: "#how-it-works" },
-  { label: "Verify", href: "#verify" },
-  { label: "Pipeline", href: "#pipeline" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Integrate", href: "#get-started" },
+  { label: "Protocol", href: "/#how-it-works" },
+  { label: "Verify", href: "/#verify" },
+  { label: "Pipeline", href: "/#pipeline" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Integrate", href: "/#get-started" },
   { label: "Docs", href: "/docs" },
 ];
 
