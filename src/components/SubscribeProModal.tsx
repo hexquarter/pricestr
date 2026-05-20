@@ -206,7 +206,7 @@ relay.onauth = (e) => window.nostr.signEvent(e)
 const subscribe = () => {
   relay.subscribe([{
     kinds: [30078],
-    "#t": ['pricestr/premium'],
+    "#t": ['pricestr/pro'],
     limit: 1
   }], {
     onevent: console.log,
@@ -340,7 +340,7 @@ subscribe();`
     relay.onauth = (e) => window.nostr.signEvent(e)
     const sub = () => relay.subscribe([{
       kinds: [30078],
-      "#t": [`pricestr/premium`],
+      "#t": [`pricestr/pro`],
       limit: 1
     }], {
       onclose(e) {
