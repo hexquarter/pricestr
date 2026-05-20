@@ -212,7 +212,8 @@ const subscribe = () => {
     onevent: console.log,
     onclose: (reason) => {
       if (reason.startsWith('auth-required')) {
-        setTimeout(subscribe, 1000);
+        // retry AFTER short delay to allow AUTH to complete
+        setTimeout(subscribe, 500);
       }
     }
   });
