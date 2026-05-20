@@ -260,6 +260,14 @@ subscribe();`
     }
   }, [npub, subscription?.active, paid])
 
+  useEffect(() => {
+    if (paid && !subscription.active) {
+      fetch(`${endpoint}/subscription/${npub}`)
+        .then(r => r.json())
+        .then(subscription => setSubscription(subscription))
+    }
+  }, [paid])
+
   const reset = () => {
     setNpub("");
     setPayment(null);
