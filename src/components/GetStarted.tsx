@@ -106,9 +106,8 @@ const GetStarted = () => {
             <div className="border-t border-border/40 pt-5 flex flex-col gap-3">
               <p className="text-[10px] font-mono uppercase tracking-widest text-primary">// integration notes</p>
               <ul className="flex flex-col gap-2 text-xs font-mono text-muted-foreground leading-relaxed">
-                <li>· Works with <span className="text-foreground">nostr-tools</span>, <span className="text-foreground">NDK</span>, <span className="text-foreground">rust-nostr</span>, and any NIP-01 client.</li>
+                <li>· Works with <span className="text-foreground">nostr-tools</span> and any Nostr client.</li>
                 <li>· Verify <span className="text-foreground">event.pubkey</span> matches the signer key above before trusting any price.</li>
-                <li>· Backfill missed events with a <span className="text-foreground">since</span> filter — relays keep full history.</li>
               </ul>
             </div>
           </div>
@@ -142,7 +141,7 @@ const GetStarted = () => {
                 <PlayIcon className="h-3 w-3 mr-2" /> Run live
               </Button>
               <div className={`flex-1 px-4 flex items-center text-[11px] font-mono text-white/60 truncate ${runResult ? "" : "opacity-50"}`}>
-                {runResult || "// output will appear here"}
+                {runResult || "// output will appear here each 60s"}
               </div>
             </div>
           </div>

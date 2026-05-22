@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
+import { ArrowUpRight } from "lucide-react";
 
 const links = [
   { label: "Protocol", href: "/#how-it-works" },
@@ -48,7 +49,7 @@ const NavBar = () => {
 
         <div className="flex items-center gap-2">
           <Button asChild size="sm" variant="outline" className="font-mono uppercase text-[11px] tracking-widest">
-            <a href="#pricing">Subscribe</a>
+            <a href="/dashboard">Dashboard <ArrowUpRight /></a>
           </Button>
         </div>
       </div>

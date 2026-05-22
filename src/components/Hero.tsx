@@ -14,6 +14,7 @@ const FREE_RELAIS = [
   'wss://relay.damus.io',
   'wss://relay.primal.net'
 ]
+const RELAY = import.meta.env.DEV ? 'http://localhost:7777' : 'https://relay.pricestr.xyz'
 
 const Hero = () => {
   const [chartData, setChartData] = useState<PriceData[]>([]);
@@ -21,10 +22,12 @@ const Hero = () => {
   const chartConfig = {} satisfies ChartConfig;
 
   useEffect(() => {
+
     const pool = new SimplePool()
-    pool.subscribe(FREE_RELAIS, {
+    const sub = pool.subscribe(FREE_RELAIS, {
       kinds: [30078],
-      "#t": [`pricestr/free`]
+      "#t": [`pricestr/free`],
+      limit: 100
     }, {
       onevent({ content }) {
         const data = JSON.parse(content);
@@ -32,6 +35,34 @@ const Hero = () => {
         setChangePrices((prev) => {
           if (prev.length === 0) return [data.median];
           return [data.median, prev[0]];
+        });
+      },
+      oneose() {
+        sub.close()
+        fetch(`${RELAY}/demo`, {
+          method: "POST",
+          credentials: "include"
+        }).then(() => {
+          const es = new EventSource(`${RELAY}/demo-events`, {
+            withCredentials: true, // IMPORTANT for cookies
+          });
+
+          es.addEventListener("message", (e) => {
+            const data = JSON.parse(e.data);
+            setChartData((prev) => [...prev, data].slice(-60));
+            setChangePrices((prev) => {
+              if (prev.length === 0) return [data.median];
+              return [data.median, prev[0]];
+            });
+          });
+
+          es.addEventListener("ping", () => {
+            console.log("heartbeat");
+          });
+
+          es.onerror = (err) => {
+            console.error("SSE error", err);
+          };
         });
       }
     })
@@ -76,11 +107,11 @@ const Hero = () => {
           </h1>
 
           <p className="text-xl md:text-2xl font-light text-foreground/90">
-            Signed. Relayed. <span className="text-violet-400">Verified.</span>
+            Signed. <span className="text-violet-400">Relayed.</span>
           </p>
 
           <div className="border-l border-violet-400/60 pl-5 flex flex-col gap-1 text-sm md:text-base text-muted-foreground leading-relaxed">
-            <p>The first verifiable Bitcoin price feed built natively for Nostr.</p>
+            <p>Bitcoin price feed built natively for Nostr.</p>
             <p>No API keys. No database. Just a signature and a relay.</p>
           </div>
 
@@ -116,7 +147,7 @@ const Hero = () => {
               </span>
               Live
             </span>
-            <span className="text-muted-foreground">60s interval</span>
+            <span className="text-muted-foreground">10s interval</span>
           </div>
 
           <div className="border border-t-0 border-border/60 bg-card/20 backdrop-blur-sm relative h-[280px] md:h-[320px]">

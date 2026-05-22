@@ -11,6 +11,8 @@ import { bech32 } from "bech32";
 import { useRelay } from "@/hooks/use-relay";
 import { EventTemplate, nip98, NostrEvent, Relay, VerifiedEvent } from "nostr-tools";
 import { Subscription } from "nostr-tools/abstract-relay";
+import { useNavigate } from "react-router-dom";
+import { npubToPubkey } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -28,8 +30,10 @@ type InvoiceDetails = {
 }
 
 type SubscriptionPayment = {
+  id: string;
   invoice: string;
-  invoiceDetails: InvoiceDetails;
+  invoiceExpirationDate: Date;
+  subscriptionExpirationDate: Date;
   amountSats: number;
 };
 
@@ -65,32 +69,18 @@ async function fetchInvoice(npub: string): Promise<SubscriptionPayment> {
       headers: { "Content-Type": "application/json" }
     });
 
-    if (res.status === 402) {
-      const auth = res.headers.get("WWW-Authenticate") || "";
-      // const macaroon = auth.match(/macaroon="([^"]+)"/)?.[1] ?? "";
-      const invoice = auth.match(/invoice="([^"]+)"/)?.[1] ?? "";
-      if (invoice) {
+    const { invoiceDetails, expireInvoiceAt, subExpiresAt } = await res.json()
+    const { id, invoice } = invoiceDetails
 
-        const body = await res.json() as {
-          macaroon: string,
-          invoice: InvoiceDetails,
-          amountSats: number
-        }
+    const amountSats = parseLightningInvoiceAmount(invoice)
 
-        const amountSats = parseLightningInvoiceAmount(invoice)
-        return {
-          invoice,
-          amountSats,
-          invoiceDetails: body.invoice
-        };
-      }
-    }
-
-    if (res.status == 200) {
-      return
-    }
-
-    throw new Error("Expected L402 endpoint");
+    return {
+      id,
+      invoice,
+      amountSats,
+      invoiceExpirationDate: new Date(expireInvoiceAt * 1000),
+      subscriptionExpirationDate: new Date(subExpiresAt * 1000)
+    };
   } catch (e) {
     throw e
   }
@@ -101,145 +91,27 @@ const isValidNpub = (s: string) => /^npub1[0-9a-z]{20,}$/i.test(s.trim());
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  renew?: boolean
+  npub?: string
 }
 
-const SubscribeProModal = ({ open, onOpenChange }: Props) => {
+const SubscribeProModal = (props: Props) => {
+  const { open, onOpenChange, renew = false } = props
+
   const [npubInput, setNpubInput] = useState("")
   const [errorNpub, setErrorNpub] = useState("")
-  const [npub, setNpub] = useState("");
+  const [npub, setNpub] = useState(props.npub || '');
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState<SubscriptionPayment | null>(null);
   const [paid, setPaid] = useState(false);
-  const [subscription, setSubscription] = useState<{ active: false, expiresAt: 0 } | undefined>(undefined)
-  const [stream, setStream] = useState<undefined | Subscription>(undefined)
-
+  const navigate = useNavigate()
   const { relay } = useRelay()
-  const [relayPub, setRelayPub] = useState("")
-  const [runResult, setRunResult] = useState<NostrEvent[]>([])
-  const [webhook, setWebhook] = useState<string>("")
-  const [webhookInput, setWebhookInput] = useState("")
-  const [webhookLoading, setWebhookLoading] = useState(false)
-
-  const loadWebhook = async (npub: string) => {
-    try {
-      const r = await fetch(`${endpoint}/webhook/${npub}`)
-      if (!r.ok) return
-      const data = await r.json()
-      setWebhook(data.webhook)
-    } catch { }
-  }
-
-  const registerWebhook = async () => {
-    const url = webhookInput.trim()
-    if (!url) return
-    try { new URL(url) } catch { toast.error("Invalid URL"); return }
-    if (!/^https?:\/\//.test(url)) { toast.error("URL must start with http(s)://"); return }
-    setWebhookLoading(true)
-
-    try {
-      if (!window.nostr) {
-        toast.error("No NIP-07 extension found (Alby, nos2x…)");
-        return;
-      }
-      const authToken = await nip98.getToken(`${endpoint}/webhook`, 'POST', async (e: any) => {
-        const signed = await window.nostr.signEvent(e);
-        return signed;
-      }, true, { url })
-
-      const r = await fetch(`${endpoint}/webhook`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken
-        },
-        body: JSON.stringify({ url }),
-      })
-      if (!r.ok) throw new Error(`HTTP ${r.status}`)
-      setWebhook(url)
-      setWebhookInput("")
-      toast.success("Webhook registered")
-    } catch (e) {
-      const err = e as Error
-      toast.error(`Failed to register webhook: ${err.message}`)
-    } finally {
-      setWebhookLoading(false)
-    }
-  }
-
-  const removeWebhook = async () => {
-    try {
-      const authToken = await nip98.getToken(`${endpoint}/webhook`, 'DELETE', async (e: any) => {
-        const signed = await window.nostr.signEvent(e);
-        return signed;
-      }, true)
-
-      const r = await fetch(`${endpoint}/webhook`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": authToken
-        }
-      })
-      if (!r.ok) throw new Error(`HTTP ${r.status}`)
-      toast.success("Webhook removed")
-      setWebhook("")
-    } catch (e) {
-      const err = e as Error
-      toast.error(`Failed to remove: ${err.message}`)
-    }
-  }
-
-  useEffect(() => {
-    if (!relay) return
-    relay.info().then(info => {
-      setRelayPub(info.pubkey)
-    })
-  }, [relay])
-
 
   const endpoint = import.meta.env.DEV ? 'http://localhost:7777' : 'https://relay.pricestr.xyz'
 
-  const snippetUsage = `import { Relay } from 'nostr-tools';
-
-const relay = await Relay.connect('wss://relay.pricestr.xyz');
-relay.onauth = (e) => window.nostr.signEvent(e)
-
-const subscribe = () => {
-  relay.subscribe([{
-    kinds: [30078],
-    "#t": ['pricestr/pro'],
-    limit: 1
-  }], {
-    onevent: console.log,
-    onclose: (reason) => {
-      if (reason.startsWith('auth-required')) {
-        // retry AFTER short delay to allow AUTH to complete
-        setTimeout(subscribe, 500);
-      }
-    }
-  });
-};
-
-subscribe();`
-
-  useEffect(() => {
-    if (!npub) return
-
-    fetch(`${endpoint}/subscription/${npub}`)
-      .then(async (r) => {
-        if (!r.ok) {
-          setSubscription({ active: false, expiresAt: 0 })
-        }
-        const { active, expiresAt } = await r.json()
-        setSubscription({ active, expiresAt })
-      })
-      .catch(() => {
-         toast.error("We cannot retrieve subscription data. Please to retry later. If the problem persist, you can contact pricestr@hexquarter.com");
-      })
-  }, [npub])
-
   useEffect(() => {
     if (payment) {
-      const es = new EventSource(`${endpoint}/invoice/${payment.invoiceDetails.id}/stream`);
+      const es = new EventSource(`${endpoint}/invoice/${payment.id}/stream`);
 
       es.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -255,33 +127,19 @@ subscribe();`
   }, [payment])
 
   useEffect(() => {
-    if (npub && (subscription?.active || paid)) {
-      loadWebhook(npub)
-    }
-  }, [npub, subscription?.active, paid])
-
-  useEffect(() => {
-    if (paid && !subscription.active) {
-      fetch(`${endpoint}/subscription/${npub}`)
-        .then(r => r.json())
-        .then(subscription => setSubscription(subscription))
+    if (paid) {
+      reset()
+      sessionStorage.setItem('subscription', npub)
+      navigate('/dashboard')
     }
   }, [paid])
 
   const reset = () => {
-    setNpub("");
+    if (!renew) setNpub("");
     setPayment(null);
     setPaid(false);
     setLoading(false);
-    setRunResult([])
-    setWebhook("")
-    setWebhookInput("")
     setErrorNpub("")
-    setSubscription(undefined)
-    if (stream) {
-      stream.close()
-      setStream(undefined)
-    }
   };
 
   const handleClose = (v: boolean) => {
@@ -298,6 +156,47 @@ subscribe();`
       setLoading(false);
     }
   };
+
+  const copy = (val: string, label: string) => {
+    navigator.clipboard.writeText(val);
+    toast.success(`${label} copied`);
+  };
+
+  useEffect(() => {
+    if (relay && open && npub) {
+      setLoading(true)
+
+      relay.getSubscription(npubToPubkey(npub)).then(async (sub) => {
+        if (!renew) {
+          if (sub) {
+            sessionStorage.setItem('subscription', npub)
+            setLoading(false)
+            navigate('/dashboard')
+            return
+          }
+
+          sessionStorage.removeItem('subscription')
+        }
+        try {
+          await requestInvoice(npub);
+          (false)
+        }
+        catch (e) {
+          const error = e as Error
+          toast.error(`Cannot generation invoice: ${error.message}`);
+        }
+        finally {
+          setLoading
+        }
+      })
+        .catch((e) => {
+          setLoading(false)
+          const error = e as Error
+          toast.error(`Cannot check subscription: ${error.message}`);
+        })
+    }
+
+  }, [open, npub, relay])
 
   const handleChangeNpub = async (npub: string) => {
     setErrorNpub("")
@@ -326,352 +225,112 @@ subscribe();`
     }
   };
 
-  const copy = (val: string, label: string) => {
-    navigator.clipboard.writeText(val);
-    toast.success(`${label} copied`);
-  };
-
-  useEffect(() => {
-    if (npub && subscription && !subscription.active) {
-      try {
-        requestInvoice(npub);
-      }
-      catch (e) {
-        const error = e as Error
-        toast.error(`Cannot generation invoice: ${error.message}`);
-      }
-    }
-
-  }, [subscription, npub])
-
-  const handleRun = async () => {
-    const relay = await Relay.connect(import.meta.env.DEV ? 'ws://localhost:7777' : 'wss://relay.pricestr.xyz');
-    relay.onauth = (e) => window.nostr.signEvent(e)
-    const sub = () => relay.subscribe([{
-      kinds: [30078],
-      "#t": [`pricestr/pro`],
-      limit: 1
-    }], {
-      onclose(e) {
-        if (e.startsWith('auth-required')) {
-          // retry AFTER short delay to allow AUTH to complete
-          setTimeout(() => {
-            const s = sub()
-            setStream(s)
-          }, 500);
-        }
-      },
-      onevent(event) {
-        setRunResult((prev) => [event, ...prev].slice(0, 3))
-      }
-    });
-
-    sub()
-  }
-
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl border-violet-400/30 bg-[#0A0A14] font-mono max-h-[90vh] overflow-auto">
         <DialogHeader>
           <DialogTitle className="font-title text-3xl uppercase tracking-tight">
-            Subscribe · <span className="text-violet-400">Pro</span>
+            {renew ? 'Renew' : <span>Subscribe · <span className="text-violet-400">Pro</span></span>}
           </DialogTitle>
           <DialogDescription className="text-xs">
-            {subscription && subscription.active ? 'You already have a current subscription' : 'Bind a Nostr identity, pay the Lightnig invoice, get access.'}
+            {renew ?
+              <p className="flex flex-col">
+                <span>Renew your subscription.</span>
+                {payment && <span>Subscription will be active until: <span className="text-primary">{payment.subscriptionExpirationDate.toLocaleString()}</span></span>}
+              </p> : <p>
+                <span>Bind a Nostr identity, pay the Lightnig invoice, get access.</span>
+                {payment && <span>Subscription will be active until: <span className="text-primary">{payment.subscriptionExpirationDate.toLocaleDateString()}</span></span>}
+              </p>}
           </DialogDescription>
         </DialogHeader>
-        {!subscription?.active &&
-          <>
-            {!payment ? (
-              <Tabs defaultValue="npub" className="mt-2">
-                <TabsList className="grid w-full grid-cols-2 bg-white/5">
-                  <TabsTrigger value="npub" className="font-mono text-xs uppercase">
-                    <KeyRound className="mr-2 h-3 w-3" /> npub
-                  </TabsTrigger>
-                  <TabsTrigger value="ext" className="font-mono text-xs uppercase">
-                    <Puzzle className="mr-2 h-3 w-3" /> Extension
-                  </TabsTrigger>
-                </TabsList>
+        {loading && <span>Loading...</span>}
+        {!loading && !payment &&
+          <Tabs defaultValue="npub" className="mt-2">
+            <TabsList className="grid w-full grid-cols-2 bg-white/5">
+              <TabsTrigger value="npub" className="font-mono text-xs uppercase">
+                <KeyRound className="mr-2 h-3 w-3" /> npub
+              </TabsTrigger>
+              <TabsTrigger value="ext" className="font-mono text-xs uppercase">
+                <Puzzle className="mr-2 h-3 w-3" /> Extension
+              </TabsTrigger>
+            </TabsList>
 
-                <TabsContent value="npub" className="flex flex-col gap-3 pt-4">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                    Public key
-                  </label>
-                  <Input
-                    value={npubInput}
-                    onChange={(e) => handleChangeNpub(e.target.value)}
-                    placeholder="npub1…"
-                    className="font-mono text-xs"
-                  />
-                  {errorNpub && <span className="text-xs text-primary">{errorNpub}</span>}
-                </TabsContent>
+            <TabsContent value="npub" className="flex flex-col gap-3 pt-4">
+              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                Public key
+              </label>
+              <Input
+                value={npubInput}
+                onChange={(e) => handleChangeNpub(e.target.value)}
+                placeholder="npub1…"
+                className="font-mono text-xs"
+              />
+              {errorNpub && <span className="text-xs text-primary">{errorNpub}</span>}
+            </TabsContent>
 
-                <TabsContent value="ext" className="flex flex-col gap-3 pt-4">
-                  <p className="text-xs text-muted-foreground">
-                    Sign with your NIP-07 browser extension (Alby, nos2x, Flamingo).
-                  </p>
-                  <Button
-                    onClick={handleExtensionConnect}
-                    disabled={loading}
-                    variant="outline"
-                    className="w-full font-mono uppercase"
-                  >
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Connect Nostr extension"}
-                  </Button>
-                </TabsContent>
-              </Tabs>
-            ) : (
-              <div className="flex flex-col gap-4 pt-2">
-                <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
-                  <span className="text-violet-400">Amount: {payment.amountSats.toLocaleString()} sats</span>
-                </div>
-
-                <div className="flex justify-center rounded-md bg-white p-4">
-                  <QRCodeSVG value={payment.invoice.toUpperCase()} size={200} level="M" />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
-                    <span>bolt11 invoice</span>
-                    <button
-                      onClick={() => copy(payment.invoice, "Invoice")}
-                      className="flex items-center gap-1 hover:text-violet-400"
-                    >
-                      <Copy className="h-3 w-3" /> copy
-                    </button>
-                  </div>
-                  <p className="break-all rounded border border-white/10 bg-white/5 p-2 text-[10px] leading-relaxed">
-                    {payment.invoice}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  {paid ? (
-                    <>
-                      <Check className="h-4 w-4 text-violet-400" /> Payment detected · access granted
-                    </>
-                  ) : (
-                    <>
-                      <Loader2 className="h-3 w-3 animate-spin" /> Waiting for payment…
-                    </>
-                  )}
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={reset}
-                    className="flex-1 font-mono uppercase"
-                  >
-                    Back
-                  </Button>
-                </div>
-              </div>
-            )}
-          </>
+            <TabsContent value="ext" className="flex flex-col gap-3 pt-4">
+              <p className="text-xs text-muted-foreground">
+                Sign with your NIP-07 browser extension (Alby, nos2x, Flamingo).
+              </p>
+              <Button
+                onClick={handleExtensionConnect}
+                disabled={loading}
+                variant="outline"
+                className="w-full font-mono uppercase"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Connect Nostr extension"}
+              </Button>
+            </TabsContent>
+          </Tabs>
         }
-        {subscription?.active &&
-          (() => {
-            const expires = new Date(subscription.expiresAt);
-            const daysLeft = Math.max(0, Math.ceil((expires.getTime() - Date.now()) / 86_400_000));
-            const streaming = !!stream;
-            const stopStream = () => {
-              if (stream) { stream.close(); setStream(undefined); }
-            };
-            return (
-              <div className="flex flex-col gap-5 pt-2">
-                {/* Status header */}
-                <div className="grid grid-cols-2 gap-px bg-white/5 border border-white/10">
-                  <div className="bg-[#0A0A14] p-3 flex flex-col gap-1">
-                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                      <ShieldCheck className="h-3 w-3" /> Status
-                    </span>
-                    <span className="flex items-center gap-2 text-xs text-violet-400">
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inset-0 rounded-full bg-violet-400 animate-ping opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
-                      </span>
-                      Active
-                    </span>
-                  </div>
-                  <div className="bg-[#0A0A14] p-3 flex flex-col gap-1">
-                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                      <Calendar className="h-3 w-3" /> Expires
-                    </span>
-                    <span className="text-xs text-white/90">{expires.toLocaleDateString()}</span>
-                    <span className="text-[10px] text-muted-foreground">{daysLeft}d remaining</span>
-                  </div>
-                </div>
+        {!loading && payment &&
+          <div className="flex flex-col gap-4 pt-2">
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span className="text-violet-400">Amount: {payment.amountSats.toLocaleString()} sats</span>
+            </div>
 
-                {/* Identity */}
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Identity</span>
-                  <div className="flex items-center justify-between gap-2 border border-white/10 bg-white/5 px-3 py-2">
-                    <code className="truncate text-[11px] text-white/80">{npub}</code>
-                    <button
-                      onClick={() => copy(npub, "npub")}
-                      className="text-muted-foreground hover:text-violet-400 shrink-0"
-                      aria-label="Copy npub"
-                    >
-                      <Copy className="h-3 w-3" />
-                    </button>
-                  </div>
-                </div>
+            <div className="flex justify-center rounded-md bg-white p-4">
+              <QRCodeSVG value={payment.invoice.toUpperCase()} size={200} level="M" />
+            </div>
 
-                {/* Webhook */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                      <Webhook className="h-3 w-3" /> Webhook
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground">
-                    Relay POSTs every signed price event to these endpoints.
-                  </p>
-
-                  {!webhook && <div className="flex gap-2">
-                    <Input
-                      value={webhookInput}
-                      onChange={(e) => setWebhookInput(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") registerWebhook() }}
-                      placeholder="https://your-app.com/hooks/pricestr"
-                      className="font-mono text-xs"
-                      disabled={webhookLoading}
-                    />
-                    <Button
-                      onClick={registerWebhook}
-                      disabled={webhookLoading || !webhookInput.trim()}
-                      variant="outline"
-                      className="font-mono uppercase text-[10px] shrink-0"
-                    >
-                      {webhookLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <>Register</>}
-                    </Button>
-                  </div>}
-
-                  {webhook && (
-                    <div className="border border-white/10 bg-[#07070C] divide-y divide-white/5">
-                      <div className="flex items-center justify-between gap-2 px-3 py-2 text-[11px] font-mono">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
-                          <code className="truncate text-white/80">{webhook}</code>
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={() => copy(webhook, "URL")}
-                            className="text-muted-foreground hover:text-violet-400 p-1"
-                            aria-label="Copy URL"
-                          >
-                            <Copy className="h-3 w-3" />
-                          </button>
-                          <button
-                            onClick={() => removeWebhook()}
-                            className="text-muted-foreground hover:text-primary p-1"
-                            aria-label="Remove webhook"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Usage · Premium feed</span>
-                  <div className="overflow-hidden rounded-md border border-white/10 bg-[#07070C]">
-                    <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
-                      <span className="flex items-center gap-2 text-[10px] font-mono text-white/50">
-                        <Terminal className="h-3 w-3" /> subscribe.ts
-                      </span>
-                      <button
-                        onClick={() => copy(snippetUsage, "Snippet")}
-                        className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-white/50 hover:text-violet-400"
-                      >
-                        <Copy className="h-3 w-3" /> copy
-                      </button>
-                    </div>
-                    <pre className="overflow-x-auto p-4 text-[11px] leading-[1.7] text-white/80">
-                      <code>{snippetUsage}</code>
-                    </pre>
-                  </div>
-                </div>
-
-                {/* Live stream */}
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                      <Radio className="h-3 w-3" /> Live stream
-                    </span>
-                    {streaming ? (
-                      <button
-                        onClick={stopStream}
-                        className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary"
-                      >
-                        <Square className="h-3 w-3" /> stop
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handleRun}
-                        className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-violet-400 hover:text-violet-300"
-                      >
-                        <PlayIcon className="h-3 w-3" /> stream prices
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="border border-white/10 bg-[#07070C] divide-y divide-white/5 min-h-[120px]">
-                    {runResult.length === 0 ? (
-                      <div className="flex items-center justify-center p-8 text-[11px] font-mono text-muted-foreground">
-                        {streaming ? (
-                          <span className="flex items-center gap-2">
-                            <Loader2 className="h-3 w-3 animate-spin" /> waiting for next signed event…
-                          </span>
-                        ) : (
-                          <span>// press "stream prices" to start</span>
-                        )}
-                      </div>
-                    ) : (
-                      runResult.map((r, i) => {
-                        let parsed: any = null;
-                        try { parsed = JSON.parse(r.content); } catch { /* keep raw */ }
-                        return (
-                          <div key={r.id || i} className="flex items-start gap-3 p-3 text-[11px] font-mono hover:bg-white/[0.02]">
-                            <span className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${i === 0 ? "bg-violet-400 animate-pulse" : "bg-white/20"}`} />
-                            <div className="flex-1 min-w-0 flex flex-col gap-1">
-                              <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
-                                <span>{new Date(r.created_at * 1000).toLocaleTimeString()}</span>
-                                <span className="text-white/30">next in 10s</span>
-                              </div>
-                              {parsed && typeof parsed === "object" ? (
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-white/85">
-                                  {Object.entries(parsed).slice(0, 6).map(([k, v]) => (
-                                    <span key={k}>
-                                      <span className="text-violet-400/80">{k}:</span>{" "}
-                                      <span className="text-white/90">
-                                        {Array.isArray(v)
-                                          ? v.join(", ")
-                                          : typeof v === "object" && v !== null
-                                            ? Object.entries(v)
-                                              .map(([key, val]) => `${key}: ${val}`)
-                                              .join(", ")
-                                            : String(v)}
-                                      </span>
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-white/85 break-all">{r.content}</span>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
+                <span>bolt11 invoice</span>
+                <button
+                  onClick={() => copy(payment.invoice, "Invoice")}
+                  className="flex items-center gap-1 hover:text-violet-400"
+                >
+                  <Copy className="h-3 w-3" /> copy
+                </button>
               </div>
-            );
-          })()
+              <p className="break-all rounded border border-white/10 bg-white/5 p-2 text-[10px] leading-relaxed">
+                {payment.invoice}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">Payment expiration date: {payment.invoiceExpirationDate.toLocaleString()}</p>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              {paid ? (
+                <>
+                  <Check className="h-4 w-4 text-violet-400" /> Payment detected · access granted
+                </>
+              ) : (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin" /> Waiting for payment…
+                </>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={reset}
+                className="flex-1 font-mono uppercase"
+              >
+                Back
+              </Button>
+            </div>
+          </div>
         }
       </DialogContent>
     </Dialog>

@@ -36,6 +36,17 @@ export function RelayProvider({ children }: { children: ReactNode }) {
     )
 }
 
+type Billing = {
+    invoice: string
+    from: number,
+    to: number
+}
+
+type Subscription = {
+    expiresAt: number
+    webhookUrl?: string
+}
+
 class PricestrRelay {
     public relay: Relay
 
@@ -50,6 +61,54 @@ class PricestrRelay {
     async info(): Promise<RelayInformation> {
         const relayInfo = await fetchRelayInformation(RELAY)
         return relayInfo
+    }
+
+    getSubscription(pubkey: string): Promise<Subscription | null> {
+        const now = Math.floor(Date.now() / 1000);
+
+        return new Promise((resolve) => {
+            let found: Subscription | null = null;
+            const sub = this.relay.subscribe([{ '#d': [`pricestr/sub/${pubkey}`] }],
+                {
+                    onevent(event) {
+                        const expiry = Number(event.tags.find(t => t[0] === 'expiration')?.[1] ?? 0);
+                        if (expiry > now) {
+                            const { webhookUrl } = JSON.parse(event.content)
+                            found = {
+                                expiresAt: expiry,
+                                webhookUrl: webhookUrl
+                            };
+                        }
+                        sub.close();
+                        resolve(found);
+                    },
+                    oneose() {
+                        sub.close();
+                        resolve(found);
+                    },
+                },
+            );
+        });
+    }
+
+    async getBillingHistory(pubkey: string): Promise<Billing[]> {
+        return new Promise((resolve) => {
+            const records: Billing[] = [];
+
+            const sub = this.relay.subscribe(
+                [{ '#t': [`pricestr/billing/${pubkey}`] }],
+                {
+                    onevent(event) {
+                        const { invoice, from, to } = JSON.parse(event.content)
+                        records.push({ invoice, from, to });
+                    },
+                    oneose() {
+                        sub.close();
+                        resolve(records);
+                    },
+                },
+            );
+        });
     }
 
     async subscribePremium(callback: (priceData: PriceData) => void) {
