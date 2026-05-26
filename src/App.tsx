@@ -8,6 +8,8 @@ import NotFound from "./pages/NotFound";
 import { useEffect, useRef } from "react";
 import { RelayProvider } from "./hooks/use-relay";
 import Dashboard from "./pages/Dashboard";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/Privacy";
 
 function ScrollToAnchor() {
   const location = useLocation();
@@ -43,6 +45,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/terms" element={<TermsOfUse />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

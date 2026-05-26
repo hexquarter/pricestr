@@ -1,6 +1,8 @@
 const links = [
   { label: "Docs", href: "/docs" },
   { label: "Pubkey", href: "/#get-started" },
+  { label: "Terms of Use", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
 ];
 
 const Footer = () => (
