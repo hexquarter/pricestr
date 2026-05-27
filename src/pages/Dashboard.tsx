@@ -1,5 +1,6 @@
 
 import { Link } from "react-router-dom";
+import { usePostHog } from "@posthog/react";
 import { BookOpen, Zap, ShieldCheck, Network, Code2, Webhook, KeyRound, Radio, ChartBar, Puzzle, Loader2, Calendar, TriangleIcon, TriangleAlertIcon, ArrowRight, Trash2, Copy, PlayIcon, Square } from "lucide-react";
 import Footer from "@/components/Footer";
 import { useEffect, useMemo, useState } from "react";
@@ -64,6 +65,7 @@ const Dashboard = () => {
   const [runResult, setRunResult] = useState<NostrEvent[]>([])
 
   const { relay } = useRelay()
+  const posthog = usePostHog()
   const [subscription, setSubscription] = useState<{ active: boolean, expiresAt: number } | undefined>(undefined)
   const [stream, setStream] = useState<undefined | Subscription>(undefined)
   const [renewOpen, setRenewOpen] = useState(false);
@@ -91,6 +93,8 @@ const Dashboard = () => {
       const pkBytes = hexToBytes(pubkey);
       const npub = bech32.encode('npub', bech32.toWords(pkBytes));
       setNpub(npub);
+      posthog?.identify(npub, { npub });
+      posthog?.capture("dashboard_connected_extension");
     } catch {
       toast.error("Extension connection rejected");
     }
@@ -166,6 +170,7 @@ const Dashboard = () => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       setWebhook(url)
       setWebhookInput("")
+      posthog?.capture("webhook_registered", { webhook_url: url });
       toast.success("Webhook registered")
     } catch (e) {
       const err = e as Error
@@ -189,6 +194,7 @@ const Dashboard = () => {
         }
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      posthog?.capture("webhook_removed");
       toast.success("Webhook removed")
       setWebhook("")
     } catch (e) {
@@ -198,6 +204,7 @@ const Dashboard = () => {
   }
 
   const handleRun = async () => {
+    posthog?.capture("live_stream_started");
     const relay = await Relay.connect(import.meta.env.DEV ? 'ws://localhost:7777' : 'wss://relay.pricestr.xyz');
     relay.onauth = (e) => window.nostr.signEvent(e)
     const sub = () => relay.subscribe([{
@@ -232,7 +239,7 @@ const Dashboard = () => {
 
   const streaming = !!stream;
   const stopStream = () => {
-    if (stream) { stream.close(); setStream(undefined); }
+    if (stream) { stream.close(); setStream(undefined); posthog?.capture("live_stream_stopped"); }
   };
 
   const disconnect = () => {
@@ -334,7 +341,7 @@ const Dashboard = () => {
                     <span className="font-mono text-muted-foreground flex items-center gap-2 uppercase"> Next renewal </span>
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold">{new Date(subscription.expiresAt * 1000).toLocaleDateString()}</span>
-                      <Button onClick={() => setRenewOpen(true)}>Renew</Button>
+                      <Button onClick={() => { posthog?.capture("subscription_renewal_opened"); setRenewOpen(true); }}>Renew</Button>
                       <SubscribeProModal renew={true} open={renewOpen} onOpenChange={setRenewOpen} npub={npub} />
                     </div>
                     <span className="flex items-center gap-2 text-muted-foreground text-xs"><TriangleAlertIcon className="h-3 w-3" />Expiring soon — renew now to avoid interruption</span>

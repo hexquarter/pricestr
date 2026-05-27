@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { SectionHead } from "./SectionHead";
 import SubscribeProModal from "./SubscribeProModal";
+import { usePostHog } from "@posthog/react";
 
 const tiers = [
   {
@@ -29,13 +30,14 @@ const tiers = [
     period: "Contact us",
     blurb: "For exchanges, custodians, and lending desks who need dedicated capacity, custom pairs, and a contractual SLA.",
     features: ["Everything in Pro", "Dedicated relay endpoint", "Private relay infrastructure", "Custom pairs & cadence", "99.95% uptime SLA"],
-    cta: { label: "Contact us", variant: "outline" as const, href: "mailto:hello@pricestr.xyz" },
+    cta: { label: "Contact us", variant: "outline" as const, href: "mailto:pricestr@hexquarter.com" },
     highlight: false,
   },
 ];
 
 const PricingTiers = () => {
   const [proOpen, setProOpen] = useState(false);
+  const posthog = usePostHog();
   return (
     <section id="pricing" className="scroll-mt-24">
       <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
@@ -54,11 +56,10 @@ const PricingTiers = () => {
           {tiers.map((t) => (
             <div
               key={t.name}
-              className={`relative flex flex-col bg-background ${
-                t.highlight
-                  ? "ring-1 ring-violet-400/60 md:-my-4 md:shadow-[0_0_60px_-15px_hsl(270_85%_70%/0.25)]"
-                  : ""
-              }`}
+              className={`relative flex flex-col bg-background ${t.highlight
+                ? "ring-1 ring-violet-400/60 md:-my-4 md:shadow-[0_0_60px_-15px_hsl(270_85%_70%/0.25)]"
+                : ""
+                }`}
             >
               {t.highlight && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-mono uppercase tracking-widest bg-violet-400 text-background px-3 py-1 rounded-full">
@@ -88,15 +89,14 @@ const PricingTiers = () => {
               <footer className="p-6 pt-0">
                 <Button
                   variant={t.cta.variant}
-                  className={`uppercase font-mono w-full tracking-widest text-[11px] h-11 ${
-                    t.highlight ? "bg-violet-400 hover:bg-violet-300 text-background" : ""
-                  }`}
+                  className={`uppercase font-mono w-full tracking-widest text-[11px] h-11 ${t.highlight ? "bg-violet-400 hover:bg-violet-300 text-background" : ""
+                    }`}
                   onClick={
                     t.name === "Pro"
-                      ? () => setProOpen(true)
+                      ? () => { posthog?.capture("subscription_modal_opened"); setProOpen(true); }
                       : t.name === "Enterprise"
-                      ? () => (window.location.href = t.cta.href)
-                      : undefined
+                        ? () => { posthog?.capture("enterprise_contact_clicked"); window.location.href = t.cta.href; }
+                        : undefined
                   }
                   asChild={t.name === "Community"}
                 >

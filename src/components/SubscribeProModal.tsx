@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { usePostHog } from "@posthog/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Button } from "./ui/button";
@@ -106,6 +107,7 @@ const SubscribeProModal = (props: Props) => {
   const [paid, setPaid] = useState(false);
   const navigate = useNavigate()
   const { relay } = useRelay()
+  const posthog = usePostHog()
 
   const endpoint = import.meta.env.DEV ? 'http://localhost:7777' : 'https://relay.pricestr.xyz'
 
@@ -128,6 +130,12 @@ const SubscribeProModal = (props: Props) => {
 
   useEffect(() => {
     if (paid) {
+      posthog?.identify(npub, { npub });
+      posthog?.capture("subscription_payment_completed", {
+        npub,
+        amount_sats: payment?.amountSats,
+        renew,
+      });
       reset()
       sessionStorage.setItem('subscription', npub)
       navigate('/dashboard')
@@ -152,6 +160,11 @@ const SubscribeProModal = (props: Props) => {
     try {
       const c = await fetchInvoice(key);
       setPayment(c);
+      posthog?.capture("subscription_invoice_requested", {
+        npub: key,
+        amount_sats: c.amountSats,
+        renew: renew,
+      });
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { SectionHead } from "./SectionHead";
 import { useRelay } from "@/hooks/use-relay";
 import { Relay } from "nostr-tools";
+import { usePostHog } from "@posthog/react";
 
 const snippet = `import { Relay } from 'nostr-tools';
 
@@ -24,6 +25,7 @@ const GetStarted = () => {
   const [relayPub, setRelayPub] = useState("");
   const [runResult, setRunResult] = useState("");
   const [copied, setCopied] = useState<string>("");
+  const posthog = usePostHog();
 
   useEffect(() => {
     if (!relay) return;
@@ -39,6 +41,7 @@ const GetStarted = () => {
 
   const handleRun = async () => {
     if (!relayPub) return;
+    posthog?.capture("get_started_snippet_run");
     const r = await Relay.connect(import.meta.env.DEV ? "ws://localhost:7777" : "wss://relay.pricestr.xyz");
     r.subscribe([{ kinds: [30078], "#t": ["pricestr/free"] }], {
       onevent(event) {
