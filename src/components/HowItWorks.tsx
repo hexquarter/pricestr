@@ -6,7 +6,7 @@ const steps = [
     n: "01",
     title: "Aggregated",
     body:
-      "Every cycle we fan out to Binance, Kraken and Coinbase in parallel. Stale ticks are rejected, outliers are dropped, and the median of the survivors becomes the canonical print. The full aggregation pipeline is open-source, reproducible, and reviewable line by line — no black box, no closed dashboard, no privileged data path.",
+      "Every cycle we fan out to CEX,DEX,Oracle in parallel. Stale ticks are rejected, outliers are dropped, and the median of the survivors becomes the canonical print. The full aggregation pipeline is open-source, reproducible, and reviewable line by line — no black box, no closed dashboard, no privileged data path.",
     meta: "median · 3 venues · stale-tick filter",
   },
   {

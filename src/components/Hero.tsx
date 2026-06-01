@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import { Line, LineChart, YAxis, CartesianGrid } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
@@ -39,45 +39,54 @@ const Hero = () => {
       },
       oneose() {
         sub.close()
-        fetch(`${RELAY}/demo`, {
-          method: "POST",
-          credentials: "include"
-        }).then(() => {
-          const es = new EventSource(`${RELAY}/demo-events`, {
-            withCredentials: true, // IMPORTANT for cookies
-          });
-
-          es.addEventListener("message", (e) => {
-            const data = JSON.parse(e.data);
-            setChartData((prev) => [...prev, data].slice(-60));
-            setChangePrices((prev) => {
-              if (prev.length === 0) return [data.median];
-              return [data.median, prev[0]];
-            });
-          });
-
-          es.addEventListener("ping", () => {
-            console.log("heartbeat");
-          });
-
-          es.onerror = (err) => {
-            console.error("SSE error", err);
-          };
-        });
       }
     })
+
+    fetch(`${RELAY}/demo`, {
+      method: "POST",
+      credentials: "include"
+    }).then(() => {
+      const es = new EventSource(`${RELAY}/demo-events`, {
+        withCredentials: true, // IMPORTANT for cookies
+      });
+
+      es.addEventListener("message", (e) => {
+        const data = JSON.parse(e.data);
+        setChartData((prev) => [...prev, data].slice(-60));
+        setChangePrices((prev) => {
+          if (prev.length === 0) return [data.median];
+          return [data.median, prev[0]];
+        });
+      });
+
+      es.addEventListener("ping", () => {
+        console.log("heartbeat");
+      });
+
+      es.onerror = (err) => {
+        console.error("SSE error", err);
+      };
+    });
   }, []);
 
-  const hasData = chartData.length > 0;
-  const last = changePrices[0];
-  const delta = changePrices.length > 1 ? changePrices[0] - changePrices[1] : 0;
-  const deltaPositive = delta >= 0;
+  const hasData = useMemo(() => chartData.length > 0, [chartData]);
+  const last = useMemo(() => changePrices[0], [changePrices]);
+  const delta = useMemo(() => (changePrices.length > 1 ? changePrices[0] - changePrices[1] : 0), [changePrices]);
+  const deltaPositive = useMemo(() => delta >= 0, [delta]);
 
   // Fallback skeleton data so the chart never looks empty
   const skeletonData = Array.from({ length: 30 }, (_, i) => ({
     median: 70000 + Math.sin(i / 3) * 80 + Math.cos(i / 5) * 40,
   }));
 
+  const sourceColor = {
+    binance: "#ffdd00",
+    coinbase: "#0059ff",
+    kraken: "#6532b7",
+    hyperliquid: "#00ffcc",
+    chainlink: "#0622f9",
+    uniswap: "#ff007a",
+  };
   return (
     <section className="relative min-h-[100svh] flex items-center overflow-hidden pt-24 pb-16">
       {/* subtle background grid */}
@@ -161,13 +170,15 @@ const Hero = () => {
                   />
                 )}
                 <YAxis domain={["dataMin - 100", "dataMax + 100"]} hide />
+
+
                 {hasData &&
-                  Object.entries(chartData[0]?.sources || {}).map(([source]) => (
+                  Object.entries(chartData[chartData.length-1]?.sources || {}).map(([source]) => (
                     <Line
                       key={source}
                       dataKey={`sources.${source}`}
                       type="natural"
-                      stroke={source === "binance" ? "#ffdd00" : source === "coinbase" ? "#0059ff" : "#6532b7"}
+                      stroke={sourceColor[source]}
                       dot={false}
                       opacity={0.5}
                       strokeWidth={1}
@@ -176,6 +187,7 @@ const Hero = () => {
                   ))}
                 <Line
                   dataKey="median"
+                  name="pricestr"
                   type="natural"
                   stroke="#ddd"
                   strokeWidth={2}
@@ -209,7 +221,7 @@ const Hero = () => {
                   ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(last)
                   : "—"}
               </p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">median · 3 sources</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">median · {hasData ? Object.keys(chartData[chartData.length - 1].sources).length : 0} sources</p>
             </div>
             <div className="flex flex-col p-5 gap-2">
               <span className="uppercase tracking-widest text-muted-foreground text-[10px]">Sources</span>
@@ -219,8 +231,8 @@ const Hero = () => {
                     <div key={source} className="text-[11px] uppercase tracking-wider flex items-center justify-between gap-2 text-muted-foreground">
                       <span className="flex items-center gap-2">
                         <div
-                          className={`w-1.5 h-1.5 rounded-full ${source === "binance" ? "bg-yellow-400" : source === "coinbase" ? "bg-blue-500" : "bg-violet-400"
-                            }`}
+                          className={`w-1.5 h-1.5 rounded-full`}
+                          style={{ backgroundColor: sourceColor[source] }}
                         />
                         {source}
                       </span>

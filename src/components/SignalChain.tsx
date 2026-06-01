@@ -2,7 +2,7 @@ import { Activity, AppWindow, Lock, Network, Shrink, ChevronRight } from "lucide
 import { SectionHead } from "./SectionHead";
 
 const stages = [
-  { icon: Activity, n: "01", title: "Exchange APIs", lines: ["Binance", "Kraken", "Coinbase"] },
+  { icon: Activity, n: "01", title: "Market sources", lines: ["Centralized Exchanges", "DEX", "Oracle"] },
   { icon: Shrink, n: "02", title: "Aggregation", lines: ["Median filter", "Open-source logic", "Isolated signer"] },
   { icon: Lock, n: "03", title: "Signed event", lines: ["Nostr event", "Immutable ID", "Tamper-proof"] },
   { icon: Network, n: "04", title: "Relay", lines: ["wss://pricestr.xyz", "Any public relay", "Dedicated for Pro+"] },

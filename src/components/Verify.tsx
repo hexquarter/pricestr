@@ -27,7 +27,7 @@ const codeLines: { k?: string; v?: string; line: React.ReactNode; indent: number
   { line: <><span className="text-muted-foreground">"pubkey"</span>: <span className="text-primary">"7f9da3c2…1b"</span>,</>, indent: 1 },
   { line: <><span className="text-muted-foreground">"created_at"</span>: <span className="text-primary">1714823944</span>,</>, indent: 1 },
   { line: <><span className="text-muted-foreground">"tags"</span>: [</>, indent: 1 },
-  { line: <>[<span className="text-violet-400">"sources"</span>, <span className="text-primary">"kraken,binance,coinbase"</span>],</>, indent: 2 },
+  { line: <>[<span className="text-violet-400">"sources"</span>, <span className="text-primary">"kraken,binance,coinbase,chainlink,uniswap,hyperliquid"</span>],</>, indent: 2 },
   { line: <>[<span className="text-violet-400">"currency"</span>, <span className="text-primary">"USD"</span>],</>, indent: 2 },
   { line: <>[<span className="text-violet-400">"tier"</span>, <span className="text-primary">"free"</span>],</>, indent: 2 },
   { line: <>[<span className="text-violet-400">"d"</span>, <span className="text-primary">"pricestr/free/1714823944"</span>],</>, indent: 2 },
