@@ -37,6 +37,8 @@ type SubscriptionPayment = {
   amountSats: number;
 };
 
+const PAYMENT_LINK = import.meta.env.DEV ? 'https://buy.stripe.com/test_7sY28q49k67W5A11RrfMA00' : 'https://buy.stripe.com/4gM14meNYeEs9Qh53DfMA02'
+
 const parseLightningInvoiceAmount = (invoice: string): number | undefined => {
   // Parse BOLT11 invoice to extract amount in BTC
   // Format: lnbc<amount><multiplier>...
@@ -102,49 +104,18 @@ const SubscribeProModal = (props: Props) => {
   const [errorNpub, setErrorNpub] = useState("")
   const [npub, setNpub] = useState(props.npub || '');
   const [loading, setLoading] = useState(false);
-  const [payment, setPayment] = useState<SubscriptionPayment | null>(null);
-  const [paid, setPaid] = useState(false);
   const navigate = useNavigate()
-  const { relay } = useRelay()
   const posthog = usePostHog()
+  const [active, setActive] = useState(false)
 
   const endpoint = import.meta.env.DEV ? 'http://localhost:7777' : 'https://relay.pricestr.xyz'
 
-  useEffect(() => {
-    if (payment) {
-      const es = new EventSource(`${endpoint}/invoice/${payment.id}/stream`);
-
-      es.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.status === "paid") {
-          setPaid(true)
-          es.close();
-        }
-      };
-
-      return () => es.close()
-    }
-  }, [payment])
-
-  useEffect(() => {
-    if (paid) {
-      posthog?.identify(npub, { npub });
-      posthog?.capture("subscription_payment_completed", {
-        npub,
-        amount_sats: payment?.amountSats,
-        renew,
-      });
-      reset()
-      sessionStorage.setItem('subscription', npub)
-      navigate('/dashboard')
-    }
-  }, [paid])
-
   const reset = () => {
-    if (!renew) setNpub("");
-    setPayment(null);
-    setPaid(false);
+    if (!renew) {
+      setNpub("");
+      setNpubInput("")
+    }
+    setActive(false)
     setLoading(false);
     setErrorNpub("")
   };
@@ -154,62 +125,6 @@ const SubscribeProModal = (props: Props) => {
     onOpenChange(v);
   };
 
-  const requestInvoice = async (key: string) => {
-    setLoading(true);
-    try {
-      const c = await fetchInvoice(key);
-      setPayment(c);
-      posthog?.capture("subscription_invoice_requested", {
-        npub: key,
-        amount_sats: c.amountSats,
-        renew: renew,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const copy = (val: string, label: string) => {
-    navigator.clipboard.writeText(val);
-    toast.success(`${label} copied`);
-  };
-
-  useEffect(() => {
-    if (relay && open && npub) {
-      setLoading(true)
-
-      relay.getSubscription(npubToPubkey(npub)).then(async (sub) => {
-        if (!renew) {
-          if (sub) {
-            sessionStorage.setItem('subscription', npub)
-            setLoading(false)
-            navigate('/dashboard')
-            return
-          }
-
-          sessionStorage.removeItem('subscription')
-        }
-        try {
-          await requestInvoice(npub);
-          (false)
-        }
-        catch (e) {
-          const error = e as Error
-          toast.error(`Cannot generation invoice: ${error.message}`);
-        }
-        finally {
-          setLoading
-        }
-      })
-        .catch((e) => {
-          setLoading(false)
-          const error = e as Error
-          toast.error(`Cannot check subscription: ${error.message}`);
-        })
-    }
-
-  }, [open, npub, relay])
-
   const handleChangeNpub = async (npub: string) => {
     setErrorNpub("")
     setNpubInput(npub)
@@ -218,6 +133,13 @@ const SubscribeProModal = (props: Props) => {
         setErrorNpub("Enter a valid npub");
         return;
       }
+
+      posthog?.identify(npub, { npub });
+      posthog?.capture("subscription_payment_started", {
+        npub,
+        mode: 'input',
+      });
+
       setNpub(npub)
     }, 500)
   };
@@ -231,119 +153,91 @@ const SubscribeProModal = (props: Props) => {
       const pubkey = await window.nostr.getPublicKey();
       const pkBytes = hexToBytes(pubkey);
       const npub = bech32.encode('npub', bech32.toWords(pkBytes));
+
+      posthog?.identify(npub, { npub });
+      posthog?.capture("subscription_payment_started", {
+        npub,
+        mode: 'extension',
+      });
+
       setNpub(npub);
     } catch {
       toast.error("Extension connection rejected");
     }
   };
 
+  useEffect(() => {
+    if (!npub) return
+    fetch(`${endpoint}/subscription/${npub}`)
+      .then(async (r) => {
+        if (!r.ok) {
+          return
+        }
+        const { active } = await r.json()
+        setActive(active)
+      })
+      .catch(console.error)
+  }, [npub])
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl border-violet-400/30 bg-[#0A0A14] font-mono max-h-[90vh] overflow-auto">
         <DialogHeader>
           <DialogTitle className="font-title text-3xl uppercase tracking-tight">
-            {renew ? 'Renew' : <span>Subscribe · <span className="text-violet-400">Pro</span></span>}
+            Subscribe · <span className="text-violet-400">Pro</span>
           </DialogTitle>
           <DialogDescription className="text-xs">
-            {renew ?
-              <p className="flex flex-col">
-                <span>Renew your subscription.</span>
-                {payment && <span>Subscription will be active until: <span className="text-primary">{payment.subscriptionExpirationDate.toLocaleString()}</span></span>}
-              </p> : <p>
-                <span>Bind a Nostr identity, pay the Lightnig invoice, get access.</span>
-                {payment && <span>Subscription will be active until: <span className="text-primary">{payment.subscriptionExpirationDate.toLocaleDateString()}</span></span>}
-              </p>}
+            <span>Bind a Nostr identity, pay the invoice, get access.</span>
           </DialogDescription>
         </DialogHeader>
-        {loading && <span>Loading...</span>}
-        {!loading && !payment &&
-          <Tabs defaultValue="npub" className="mt-2">
-            <TabsList className="grid w-full grid-cols-2 bg-white/5">
-              <TabsTrigger value="npub" className="font-mono text-xs uppercase">
-                <KeyRound className="mr-2 h-3 w-3" /> npub
-              </TabsTrigger>
-              <TabsTrigger value="ext" className="font-mono text-xs uppercase">
-                <Puzzle className="mr-2 h-3 w-3" /> Extension
-              </TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="npub" className="mt-2">
+          <TabsList className="grid w-full grid-cols-2 bg-white/5">
+            <TabsTrigger value="npub" className="font-mono text-xs uppercase">
+              <KeyRound className="mr-2 h-3 w-3" /> npub
+            </TabsTrigger>
+            <TabsTrigger value="ext" className="font-mono text-xs uppercase">
+              <Puzzle className="mr-2 h-3 w-3" /> Extension
+            </TabsTrigger>
+          </TabsList>
 
-            <TabsContent value="npub" className="flex flex-col gap-3 pt-4">
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                Public key
-              </label>
-              <Input
-                value={npubInput}
-                onChange={(e) => handleChangeNpub(e.target.value)}
-                placeholder="npub1…"
-                className="font-mono text-xs"
-              />
-              {errorNpub && <span className="text-xs text-primary">{errorNpub}</span>}
-            </TabsContent>
+          <TabsContent value="npub" className="flex flex-col gap-3 pt-4">
+            <label className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Public key
+            </label>
+            <Input
+              value={npubInput}
+              onChange={(e) => handleChangeNpub(e.target.value)}
+              placeholder="npub1…"
+              className="font-mono text-xs"
+            />
+            {errorNpub && <span className="text-xs text-primary">{errorNpub}</span>}
+          </TabsContent>
 
-            <TabsContent value="ext" className="flex flex-col gap-3 pt-4">
-              <p className="text-xs text-muted-foreground">
-                Sign with your NIP-07 browser extension (Alby, nos2x, Flamingo).
-              </p>
-              <Button
-                onClick={handleExtensionConnect}
-                disabled={loading}
-                variant="outline"
-                className="w-full font-mono uppercase"
-              >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Connect Nostr extension"}
-              </Button>
-            </TabsContent>
-          </Tabs>
-        }
-        {!loading && payment &&
-          <div className="flex flex-col gap-4 pt-2">
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
-              <span className="text-violet-400">Amount: {payment.amountSats.toLocaleString()} sats</span>
-            </div>
+          <TabsContent value="ext" className="flex flex-col gap-3 pt-4">
 
-            <div className="flex justify-center rounded-md bg-white p-4">
-              <QRCodeSVG value={payment.invoice.toUpperCase()} size={200} level="M" />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
-                <span>bolt11 invoice</span>
-                <button
-                  onClick={() => copy(payment.invoice, "Invoice")}
-                  className="flex items-center gap-1 hover:text-violet-400"
+            {!npub &&
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Sign with your NIP-07 browser extension (Alby, nos2x, Flamingo).
+                </p>
+                <Button
+                  onClick={handleExtensionConnect}
+                  disabled={loading}
+                  variant="outline"
+                  className="w-full font-mono uppercase"
                 >
-                  <Copy className="h-3 w-3" /> copy
-                </button>
-              </div>
-              <p className="break-all rounded border border-white/10 bg-white/5 p-2 text-[10px] leading-relaxed">
-                {payment.invoice}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">Payment expiration date: {payment.invoiceExpirationDate.toLocaleString()}</p>
-            </div>
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Connect Nostr extension"}
+                </Button>
+              </>
+            }
+            {npub &&
+              <p className="text-xs text-muted-foreground text-center p-2 border border-border">Subscribe for: {npub}</p>
+            }
+          </TabsContent>
+        </Tabs>
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              {paid ? (
-                <>
-                  <Check className="h-4 w-4 text-violet-400" /> Payment detected · access granted
-                </>
-              ) : (
-                <>
-                  <Loader2 className="h-3 w-3 animate-spin" /> Waiting for payment…
-                </>
-              )}
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={reset}
-                className="flex-1 font-mono uppercase"
-              >
-                Back
-              </Button>
-            </div>
-          </div>
-        }
+        {active && <p className="text-xs">Your account is already an active subscription. <a href='/dashboard' className="text-primary hover:underline">Access your dashboard direclty</a></p>}
+        {!active && <Button onClick={() => window.open(`${PAYMENT_LINK}?client_reference_id=${npub}`)} disabled={!npub || loading}>Pay</Button>}
       </DialogContent>
     </Dialog>
   );

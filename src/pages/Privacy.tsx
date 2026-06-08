@@ -108,7 +108,7 @@ const PrivacyPolicy = () => (
             <Block id="information-collected" title="2. Information We Collect">
               <SubBlock id="" title="2.1 Information You Provide">
                 <ul className="list-disc flex flex-col gap-3">
-                  <li>Payment information: When you subscribe to Pro tier, we receive a Lightning invoice payment confirmation. We do not see or store your wallet private keys.</li>
+                  <li>Payment information: When you subscribe to Pro tier, payments are processed through Stripe. We receive payment confirmation and store necessary billing information to manage your subscription.</li>
                   <li>Nostr public key: If you subscribe, we may associate your Nostr pubkey with your subscription for access control.</li>
                 </ul>
               </SubBlock>
@@ -116,6 +116,7 @@ const PrivacyPolicy = () => (
                 <ul className="list-disc flex flex-col gap-3">
                   <li>IP addresses: Temporarily logged for rate limiting and abuse prevention. Not permanently stored.</li>
                   <li>Relay connection logs: Basic metadata (connection time, subscription requests) may be logged for operational purposes.</li>
+                  <li>PostHog analytics: We use PostHog to collect product usage events and analytics to understand how users interact with our platform, track feature adoption, and improve our service.</li>
                 </ul>
               </SubBlock>
             </Block>
@@ -127,6 +128,7 @@ const PrivacyPolicy = () => (
                 <li>To communicate with you (e.g., subscription reminders, service updates)</li>
                 <li>To prevent abuse and ensure fair usage</li>
                 <li>To improve our infrastructure and features</li>
+                <li>To track product usage and analytics through PostHog, helping us understand user behavior and improve the product</li>
               </ul>
             </Block>
 
@@ -141,7 +143,7 @@ const PrivacyPolicy = () => (
             <Block id="data-sharing" title="5. Data Sharing">
               <p>We do not sell or rent your personal data. We may share data only in these limited circumstances:</p>
               <ul className="list-disc flex flex-col gap-3">
-                <li>Service providers: Hosting providers (Hetzner, OVH, etc.) who process data on our behalf under confidentiality agreements</li>
+                <li>Service providers: Hosting providers (Hetzner, OVH, etc.), Stripe for payment processing, and PostHog for analytics, who process data on our behalf under confidentiality agreements</li>
                 <li>Legal compliance: If required by law or to protect our rights</li>
                 <li>Nostr network: Your subscription status to the Nostr network; only proof of payment, subscription end date and and public key information is public</li>
               </ul>

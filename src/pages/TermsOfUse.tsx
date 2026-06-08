@@ -14,6 +14,7 @@ const toc: Section[] = [
   { id: "no-financial-advice", label: "No Financial Advice" },
   { id: "subscription-payment", label: "Subscription and Payment" },
   { id: "acceptable-use", label: "Acceptable Use" },
+  { id: "analytics-tracking", label: "Analytics and Tracking" },
   { id: "relay-availability", label: "Relay and Data Availability" },
   { id: "intellectual-property", label: "Intellectual Property" },
   { id: "limitation", label: "Limitation of Liability" },
@@ -138,7 +139,7 @@ const TermsOfUse = () => (
                   <p>The free tier requires no payment and provides basic access to BTC/USD price data.</p>
                 </SubBlock>
                 <SubBlock id='' title="4.2 Pro Tier">
-                  <p>Pro tier subscriptions are priced in Bitcoin (sats) and paid via Lightning Network invoices. Payments are non-refundable.</p>
+                  <p>Pro tier subscriptions are paid via Stripe. Payments are non-refundable.</p>
                   <ul className="list-disc flex flex-col gap-3">
                     <li>Subscriptions grant access to dedicated relays, faster update intervals, additional currency pairs, and webhook delivery.</li>
                     <li>Access is granted for a 30-day period from payment confirmation.</li>
@@ -165,7 +166,12 @@ const TermsOfUse = () => (
               <p>Violation may result in immediate termination of access without refund.</p>
             </Block>
 
-            <Block id="relay-availability" title="6. Relay and Data Availability">
+            <Block id="analytics-tracking" title="6. Analytics and Tracking">
+              <p>PriceStr uses PostHog to collect anonymous product usage events and analytics. This helps us understand how users interact with our platform, track feature adoption, and improve our service. Analytics data is collected to provide insights into user behavior and service optimization.</p>
+              <p>You can manage your privacy preferences through your browser settings or contact us if you have concerns about data collection.</p>
+            </Block>
+
+            <Block id="relay-availability" title="7. Relay and Data Availability">
               <p>PriceStr publishes events to Nostr relays. While we strive for high availability:</p>
               <ul className="list-disc flex flex-col gap-3">
                 <li>We do not guarantee 100% uptime</li>
@@ -175,7 +181,7 @@ const TermsOfUse = () => (
               </ul>
             </Block>
 
-            <Block id="intellectual-property" title="7. Intellectual Property">
+            <Block id="intellectual-property" title="8. Intellectual Property">
               <ul className="list-disc flex flex-col gap-3">
                 <li>The PriceStr name, logo, and branding are property of HexQuarter.</li>
                 <li>Price events (the data) are public domain or licensed for free use.</li>
@@ -184,7 +190,7 @@ const TermsOfUse = () => (
               <p>You may freely use verified price events in your applications without restriction.</p>
             </Block>
 
-            <Block id="limitation" title="8. Limitation of Liability">
+            <Block id="limitation" title="9. Limitation of Liability">
               <p>To the maximum extent permitted by law:</p>
               <ul className="list-disc flex flex-col gap-3">
                 <li>PriceStr and HexQuarter are not liable for any direct, indirect, incidental, or consequential damages arising from your use of the Service.</li>
@@ -193,19 +199,19 @@ const TermsOfUse = () => (
               </ul>
             </Block>
 
-            <Block id="disclaimer" title="9. Disclaimer of Warranties">
+            <Block id="disclaimer" title="10. Disclaimer of Warranties">
               <p>The Service is provided "as is" and "as available" without warranties of any kind, express or implied. We do not warrant that the Service will be uninterrupted, error-free, or secure.</p>
             </Block>
 
-            <Block id="modifications" title="10. Modifications to the Service">
+            <Block id="modifications" title="11. Modifications to the Service">
               <p>We reserve the right to modify, suspend, or discontinue any part of the Service at any time, with or without notice. This includes pricing changes for new subscribers (existing subscribers will be notified before price changes apply to renewals).</p>
             </Block>
 
-            <Block id="governing-law" title="11. Governing Law">
+            <Block id="governing-law" title="12. Governing Law">
               <p>These Terms shall be governed by the laws of France (or the jurisdiction where HexQuarter is registered), without regard to conflict of law principles.</p>
             </Block>
 
-            <Block id="contact" title="12. Contact">
+            <Block id="contact" title="13. Contact">
               <p>For questions about these Terms, contact us at: <a href="mailto:pricestr@hexquarter.com" className="text-white hover:underline">pricestr@hexquarter.com</a></p>
             </Block>
           </article>

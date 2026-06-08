@@ -57,7 +57,7 @@ const HowItWorks = () => (
 
       <div className="grid md:grid-cols-3 border border-border/40 border-t-0 -mt-12">
         {[
-          { k: "End-to-end latency", v: "< 1.2s", sub: "from exchange tick to signed event on the relay" },
+          { k: "End-to-end latency", v: "< 5s", sub: "from exchange tick to signed event on the relay" },
           { k: "Failure mode", v: "Fail closed", sub: "if sources disagree past tolerance, no event is published" },
           { k: "Trust surface", v: "1 signature", sub: "everything else is verifiable, replaceable, or open-source" },
         ].map((s, i) => (

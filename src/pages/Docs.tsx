@@ -38,7 +38,7 @@ const Block: React.FC<{ id: string; eyebrow: string; title: string; children: Re
     <h2 className="text-3xl md:text-5xl tracking-tight font-[900] font-title uppercase leading-[0.95]">
       {title}
     </h2>
-    <div className="flex flex-col gap-4 text-sm leading-relaxed text-muted-foreground font-mono max-w-3xl">
+    <div className="flex flex-col gap-4 text-sm leading-relaxed text-white/70 font-mono max-w-3xl">
       {children}
     </div>
   </section>
@@ -100,8 +100,8 @@ const Docs = () => (
             <Block id="overview" eyebrow="01 · overview" title="What is PriceStr?">
               <p>
                 PriceStr is a public price oracle for Bitcoin built natively on the Nostr protocol.
-                It aggregates real-time exchange data from Binance, Kraken and Coinbase, computes a
-                tamper-resistant median, signs the result with a dedicated Nostr keypair, and
+                It aggregates real-time exchange data from major <span className="text-white font-bold">CEX: Binance, Kraken Coinbase</span>, <span className="font-bold text-white">Oracle (Chainlink)</span>, <span className="font-bold text-white">DEX (Uniswap)</span>, <span className="text-white font-bold">P2P Marketplace (Hyperliquid)</span> and computes
+                <span className="font-bold text-violet-400"> a tamper-resistant and signed median</span>, with a dedicated Nostr keypair, and
                 broadcasts the event to the open relay network.
               </p>
               <p>
@@ -110,10 +110,10 @@ const Docs = () => (
                 SDKs. The signature is the contract.
               </p>
               <ul className="list-none flex flex-col gap-2 pl-0">
-                <li>· <span className="text-foreground">Verifiable</span> — every event carries a Schnorr signature bound to PriceStr's public key.</li>
-                <li>· <span className="text-foreground">Decentralized</span> — fetch from any relay storing the events. Relays cannot forge prices.</li>
-                <li>· <span className="text-foreground">Open</span> — aggregation logic, schema, and verification examples are MIT-licensed.</li>
-                <li>· <span className="text-foreground">Lightning-native</span> — the Pro tier is paid in sats; no card, no account.</li>
+                <li>· <span className="text-foreground font-bold">Verifiable</span> — every event carries a Schnorr signature bound to PriceStr's public key.</li>
+                <li>· <span className="text-foreground font-bold">Decentralized</span> — fetch from any relay storing the events. Relays cannot forge prices.</li>
+                <li>· <span className="text-foreground font-bold">Open</span> — aggregation logic, schema, and verification examples are MIT-licensed.</li>
+                <li>· <span className="text-foreground font-bold">Lightning-native</span> — the Pro tier is paid in sats; no card, no account.</li>
               </ul>
             </Block>
 
@@ -121,12 +121,12 @@ const Docs = () => (
               <p>
                 Traditional price APIs trade trust for convenience: you receive raw JSON and must
                 trust the provider that nothing was rewritten in transit, in their cache, or behind
-                their CDN. Even a TLS-secured response only proves you talked to the server — not
+                their CDN. <br /><br />Even a TLS-secured response only proves you talked to the server — not
                 that the server told you the truth.
               </p>
               <p>
-                Nostr inverts this model. Each price event is a self-contained, signed object. The
-                signature is computed once at the source and travels with the data. Whether the
+                Nostr inverts this model. <br />Each price event is <span className="text-white font-bold">a self-contained, signed object</span>. The
+                signature is computed once at the source and travels with the data. <br />Whether the
                 event reaches you through our relay, a community relay, or is replayed from a peer
                 cache an hour later, you can verify it locally in microseconds.
               </p>
@@ -180,7 +180,7 @@ const Docs = () => (
   "pubkey": "7f9da3c2…1b",
   "created_at": 1714823944,
   "tags": [
-    ["sources", "kraken,binance,coinbase"],
+    ["sources", "kraken,binance,coinbase,hyperliquid,uniswap,chainlink"],
     ["currency","USD"],
     ["tier",    "free"],
     ["d",       "pricestr/free/1714823944"],
@@ -238,16 +238,20 @@ relay.subscribe([{
   }
 });`}</Code>
               <p>
-                The free feed updates every 60 seconds and currently exposes BTC/USD only. It is
-                suitable for dashboards, wallets, status pages, and any UI that does not need
+                The free feed updates every 60 seconds and currently exposes BTC/USD only. 
+                <br />
+                It is suitable for <span className="text-white font-bold">dashboards, wallets, status pages, and any UI</span> that does not need
                 sub-minute granularity.
               </p>
             </Block>
 
             <Block id="pro-tier" eyebrow="07 · pro tier" title="Pro: authenticated relay access">
               <p>
-                The Pro tier delivers 10-second updates, additional currency pairs (EUR, GBP, JPY)
-                and webhook delivery. Access is gated by <span className="text-foreground">NIP-42</span> —
+                The Pro tier delivers <span className="text-white font-bold">10-second updates</span>, <span className="text-white font-bold">additional currency pairs (FOREX rates: EUR, GBP, JPY, etc.)</span>
+                {" "}and <span className="text-white font-bold">webhook delivery</span>. 
+                <br />
+                <br />
+                Access is gated by <span className="text-foreground">NIP-42</span> —
                 Nostr's native authentication scheme — so your subscription is bound to a Nostr
                 keypair, not an API token.
               </p>
@@ -256,48 +260,47 @@ relay.subscribe([{
                 invoice. There are two integration paths:
               </p>
               <ul className="list-none flex flex-col gap-2 pl-0">
-                <li>· <span className="text-foreground">Client-side</span> — your frontend uses a Nostr browser extension (Alby, nos2x) to sign the AUTH challenge directly.</li>
-                <li>· <span className="text-foreground">Server-side</span> — a tiny worker maintains one authenticated session and re-broadcasts events to your app via your own transport.</li>
+                <li>· <span className="text-foreground font-bold">Client-side</span> — your frontend uses a Nostr browser extension (Alby, nos2x) to sign the AUTH challenge directly.</li>
+                <li>· <span className="text-foreground font-bold">Server-side</span> — a tiny worker maintains one authenticated session and re-broadcasts events to your app via your own transport.</li>
               </ul>
             </Block>
 
             <Block id="webhooks" eyebrow="08 · webhooks" title="Webhook delivery">
               <p>
-                Pro subscribers can register up to 10,000 webhook deliveries per month. The relay
+                Pro subscribers can register to webhook deliveries. 
+                <br /><br />
+                The relay
                 POSTs each new price event to your endpoint as soon as it is signed, with the full
                 Nostr event in the body so you can verify it independently of the transport.
               </p>
               <Code lang="POST /webhook">{`POST https://your-app.example.com/pricestr
 Content-Type: application/json
-X-Pricestr-Signature: <hmac-sha256(secret, body)>
 
 {
   "event": { /* full Nostr event, kind 30078 */ },
   "delivered_at": 1714823945
 }`}</Code>
               <p>
-                Webhooks are managed from the Pro dashboard. Deliveries are retried with
-                exponential backoff for up to 24 hours; persistent failures pause the endpoint and
-                notify the subscriber.
+                Webhooks are managed from the Pro dashboard.
               </p>
             </Block>
 
             <Block id="faq" eyebrow="09 · faq" title="Frequently asked">
               <div className="flex flex-col gap-5">
                 <div>
-                  <p className="text-foreground">Do I need an account to use the free feed?</p>
+                  <p className="text-foreground font-bold">Do I need an account to use the free feed?</p>
                   <p>No. There is no signup, no key, and no rate limiter for normal use. Just connect to a relay and subscribe.</p>
                 </div>
                 <div>
-                  <p className="text-foreground">What happens if a relay goes down?</p>
+                  <p className="text-foreground font-bold">What happens if a relay goes down?</p>
                   <p>Connect to another. Events are signed at the source, so any relay carrying them is equivalent. The signature is the truth — not the relay.</p>
                 </div>
                 <div>
-                  <p className="text-foreground">Can I self-host a mirror?</p>
+                  <p className="text-foreground font-bold">Can I self-host a mirror?</p>
                   <p>Yes. Run any Nostr relay implementation (strfry, nostream, khatru) and subscribe to PriceStr events from upstream. Your mirror serves the same signed events.</p>
                 </div>
                 <div>
-                  <p className="text-foreground">How is Pro authenticated without an API key?</p>
+                  <p className="text-foreground font-bold">How is Pro authenticated without an API key?</p>
                   <p>Via NIP-42. The relay sends a challenge; your client signs it with a Nostr key. The signature is verified against the list of paid pubkeys.</p>
                 </div>
               </div>

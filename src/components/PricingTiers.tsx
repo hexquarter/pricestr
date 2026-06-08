@@ -17,7 +17,7 @@ const tiers = [
   },
   {
     name: "Pro",
-    price: "$15",
+    price: "$10",
     period: "/ month",
     blurb: "For trading UIs, fintech products, and production workloads. Faster cadence, multi-currency, and authenticated relay access.",
     features: ["BTC/USD + forex rates", "10-second updates", "Webhooks", "NIP-42 premium relay"],
@@ -49,7 +49,6 @@ const PricingTiers = () => {
               <span className="text-violet-400">pricing</span>
             </>
           }
-          lead="Pay in sats over Lightning. No accounts, no credit cards, no contracts. Your subscription is bound to a Nostr pubkey — cancel by simply not renewing."
         />
 
         <div className="grid md:grid-cols-3 gap-px bg-border/40">
@@ -93,7 +92,7 @@ const PricingTiers = () => {
                     }`}
                   onClick={
                     t.name === "Pro"
-                      ? () => { posthog?.capture("subscription_modal_opened"); setProOpen(true); }
+                      ? () => { posthog?.capture("subscription_modal_opened"); setProOpen(true)}
                       : t.name === "Enterprise"
                         ? () => { posthog?.capture("enterprise_contact_clicked"); window.location.href = t.cta.href; }
                         : undefined
@@ -103,19 +102,6 @@ const PricingTiers = () => {
                   {t.name === "Community" ? <a href={t.cta.href}>{t.cta.label}</a> : <span>{t.cta.label}</span>}
                 </Button>
               </footer>
-            </div>
-          ))}
-        </div>
-        <div className="grid md:grid-cols-3 border border-border/40 mt-2">
-          {[
-            { k: "Payment", v: "Lightning · sats", sub: "Pay the BOLT11 invoice from any Lightning wallet. No fiat rails, no chargebacks." },
-            { k: "Identity", v: "Nostr pubkey", sub: "Your subscription is bound to an npub — not an email, not an API token." },
-            { k: "Cancellation", v: "Don't renew", sub: "There is no recurring charge. The relay simply stops granting access at expiry." },
-          ].map((s, i) => (
-            <div key={s.k} className={`p-6 flex flex-col gap-2 ${i > 0 ? "md:border-l border-border/40 border-t md:border-t-0" : ""}`}>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{s.k}</p>
-              <p className="font-title font-[900] uppercase tracking-tight text-xl text-foreground">{s.v}</p>
-              <p className="text-xs font-mono text-muted-foreground leading-relaxed">{s.sub}</p>
             </div>
           ))}
         </div>

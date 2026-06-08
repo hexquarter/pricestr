@@ -7,9 +7,13 @@ import Docs from "./pages/Docs";
 import NotFound from "./pages/NotFound";
 import { useEffect, useRef } from "react";
 import { RelayProvider } from "./hooks/use-relay";
-import Dashboard from "./pages/Dashboard";
+import DashboardPage from "./pages/DashboardPage";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/Privacy";
+import { Dashboard } from "./components/Dashboard";
+import { SubscriptionProvider } from "./hooks/use-subscription";
+import { Webhooks } from "./components/Webhooks";
+import { Integration } from "./components/Integration";
 
 function ScrollToAnchor() {
   const location = useLocation();
@@ -44,7 +48,15 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/docs" element={<Docs />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={
+            <SubscriptionProvider>
+              <DashboardPage />
+            </SubscriptionProvider>
+          }>
+            <Route index Component={Dashboard} />
+            <Route path='webhooks' Component={Webhooks} />
+            <Route path='integration' Component={Integration} />
+          </Route>
           <Route path="/terms" element={<TermsOfUse />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
