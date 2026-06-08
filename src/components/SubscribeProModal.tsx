@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { hexToBytes } from "nostr-tools/utils";
 import { bech32 } from "bech32";
 import { useRelay } from "@/hooks/use-relay";
-import { EventTemplate, VerifiedEvent } from "nostr-tools";
+import { EventTemplate, generateSecretKey, getPublicKey, nip19, VerifiedEvent } from "nostr-tools";
 import { useNavigate } from "react-router-dom";
 import { npubToPubkey } from "@/lib/utils";
 
@@ -108,6 +108,7 @@ const SubscribeProModal = (props: Props) => {
   const posthog = usePostHog()
   const [active, setActive] = useState(false)
 
+  const [identityNsec, setIdentityNsec] = useState("")
   const endpoint = import.meta.env.DEV ? 'http://localhost:7777' : 'https://relay.pricestr.xyz'
 
   const reset = () => {
@@ -179,6 +180,18 @@ const SubscribeProModal = (props: Props) => {
       .catch(console.error)
   }, [npub])
 
+  const genIdentity = () => {
+    const sk = generateSecretKey()
+    const pk = getPublicKey(sk)
+
+    let nsec = nip19.nsecEncode(sk)
+    let npub = nip19.npubEncode(pk)
+
+    setIdentityNsec(nsec)
+    setNpubInput(npub)
+    setNpub(npub)
+  }
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl border-violet-400/30 bg-[#0A0A14] font-mono max-h-[90vh] overflow-auto">
@@ -211,7 +224,12 @@ const SubscribeProModal = (props: Props) => {
               className="font-mono text-xs"
             />
             {errorNpub && <span className="text-xs text-primary">{errorNpub}</span>}
+
+            {!identityNsec && <p className="text-xs text-center mt-5">Don't have a Nostr identity ?, <a className='text-primary hover:underline cursor-pointer' onClick={() => genIdentity()}>you can create one instantly.</a></p>}
+            {identityNsec && <p className="text-xs text-center mt-5 text-muted-foreground">Here your nsec: <span className="text-white">{identityNsec}</span>, please keep it secure, as it is your identity.</p>}
+
           </TabsContent>
+
 
           <TabsContent value="ext" className="flex flex-col gap-3 pt-4">
 
