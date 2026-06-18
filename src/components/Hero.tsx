@@ -68,30 +68,31 @@ const Hero = () => {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
               <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
             </span>
-            Live signal · BTC/USD
+            Decentralized price oracle · live on Nostr
           </div>
 
-          <h1 className="text-6xl md:text-8xl tracking-tight font-[900] font-title uppercase leading-[0.9]">
-            Price<span className="text-violet-400">Str</span>
+          <h1 className="text-5xl md:text-7xl tracking-tight font-[900] font-title uppercase leading-[0.9]">
+            Verifiable <span className="text-violet-400">BTC price</span> for the rest of your stack.
           </h1>
 
-          <p className="text-xl md:text-2xl font-light text-foreground/90">
-            Signed. Relayed. <span className="text-violet-400">Verified.</span>
+          <p className="text-lg md:text-xl font-light text-foreground/90 leading-relaxed">
+            The decentralized price oracle for Bitcoin & Nostr-native dApps. Signed at the source, served over relays, verified locally. No API keys. No trusted middlemen. No oracle risk.
           </p>
 
-          <div className="border-l border-violet-400/60 pl-5 flex flex-col gap-1 text-sm md:text-base text-muted-foreground leading-relaxed">
-            <p>The first verifiable Bitcoin price feed built natively for Nostr.</p>
-            <p>No API keys. No database. Just a signature and a relay.</p>
+          <div className="border-l border-violet-400/60 pl-5 flex flex-col gap-1 text-sm text-muted-foreground leading-relaxed font-mono">
+            <p>· Drop-in for wallets, DEXes, lending desks, LSPs and Nostr apps</p>
+            <p>· One Schnorr signature replaces a CoinGecko key + a Chainlink feed</p>
+            <p>· $10/mo for production. Free forever for builders.</p>
           </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button asChild className="font-mono uppercase tracking-widest text-xs h-11 px-6">
-              <Link to="#get-started">
-                Start for free <ArrowRight className="ml-2 h-4 w-4" />
+            <Button asChild className="font-mono uppercase tracking-widest text-xs h-11 px-6 bg-violet-400 hover:bg-violet-300 text-background">
+              <Link to="#pricing">
+                Start for $10/mo <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button variant="outline" asChild className="font-mono uppercase tracking-widest text-xs h-11 px-6">
-              <Link to="#how-it-works">How it works</Link>
+              <Link to="#get-started">Try free feed →</Link>
             </Button>
           </div>
 
@@ -99,8 +100,11 @@ const Hero = () => {
             <span className="py-1.5 px-3 text-[10px] font-mono uppercase tracking-widest rounded-full border border-border/60 text-muted-foreground">
               Open-source
             </span>
+            <span className="py-1.5 px-3 text-[10px] font-mono uppercase tracking-widest rounded-full border border-border/60 text-muted-foreground">
+              Lightning-paid
+            </span>
             <span className="py-1.5 px-3 text-[10px] font-mono uppercase tracking-widest rounded-full border border-primary/20 text-primary/80">
-              Lightning native
+              No KYC · no accounts
             </span>
           </div>
         </div>
