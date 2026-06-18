@@ -9,25 +9,32 @@ const tiers = [
     name: "Community",
     price: "Free",
     period: "Forever",
-    blurb: "For wallets, dashboards, status pages, and weekend builds. Same signed events as Pro — slower cadence, public transport.",
-    features: ["BTC/USD public feed", "60-second interval", "Public relays", "Community support"],
+    blurb: "For wallets, dashboards, status pages and weekend builds. The same signed events as Pro, at a slower cadence, served over public relays.",
+    features: ["BTC/USD public feed", "60-second cadence", "Public Nostr relays", "Community support"],
     cta: { label: "Get started", variant: "outline" as const, href: "#get-started" },
     highlight: false,
   },
   {
     name: "Pro",
-    price: "$15",
+    price: "$10",
     period: "/ month",
-    blurb: "For trading UIs, fintech products, and production workloads. Faster cadence, multi-currency, and authenticated relay access.",
-    features: ["BTC/USD + forex rates", "10-second updates", "Webhooks", "NIP-42 premium relay"],
-    cta: { label: "Subscribe", variant: "default" as const, href: "#subscribe-pro" },
+    blurb: "Built for Bitcoin & Nostr-native financial infrastructure: DEXes, lending desks, LSPs, wallets, payment processors. Everything in your stack is decentralized — your price feed should be too.",
+    features: [
+      "BTC/USD + major forex pairs",
+      "10-second cadence",
+      "Authenticated relay (NIP-42)",
+      "Webhook delivery + replay",
+      "99.9% uptime target",
+      "Priority support on Nostr",
+    ],
+    cta: { label: "Subscribe — pay in sats", variant: "default" as const, href: "#subscribe-pro" },
     highlight: true,
   },
   {
     name: "Enterprise",
     price: "Custom",
     period: "Contact us",
-    blurb: "For exchanges, custodians, and lending desks who need dedicated capacity, custom pairs, and a contractual SLA.",
+    blurb: "For exchanges, custodians and market makers who need dedicated capacity, custom pairs and a contractual SLA.",
     features: ["Everything in Pro", "Dedicated relay endpoint", "Private relay infrastructure", "Custom pairs & cadence", "99.95% uptime SLA"],
     cta: { label: "Contact us", variant: "outline" as const, href: "mailto:hello@pricestr.xyz" },
     highlight: false,
@@ -61,8 +68,8 @@ const PricingTiers = () => {
               }`}
             >
               {t.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-mono uppercase tracking-widest bg-violet-400 text-background px-3 py-1 rounded-full">
-                  Production-ready
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-mono uppercase tracking-widest bg-violet-400 text-background px-3 py-1 rounded-full whitespace-nowrap">
+                  Most teams pick this · $10/mo
                 </div>
               )}
               <header className="flex flex-col gap-3 p-6 border-b border-border/40">
