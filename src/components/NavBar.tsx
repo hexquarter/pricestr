@@ -47,8 +47,8 @@ const NavBar = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild size="sm" variant="outline" className="font-mono uppercase text-[11px] tracking-widest">
-            <a href="#pricing">Subscribe</a>
+          <Button asChild size="sm" className="font-mono uppercase text-[11px] tracking-widest bg-violet-400 hover:bg-violet-300 text-background">
+            <a href="#pricing">Start · $10/mo</a>
           </Button>
         </div>
       </div>
