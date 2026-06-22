@@ -27,8 +27,8 @@ No backend needed for the free tier. No database. No API key.
 - Signature verification examples in JavaScript/TypeScript
 - Open‑source aggregation logic
 
-### Pro Tier (coming soon – paid in Bitcoin)
-- BTC/USD + EUR, GBP, JPY (derived from live forex)
+### Pro Tier
+- BTC/USD + Forex pairs
 - 10‑second updates
 - Webhooks (10k/month)
 - Priority support
