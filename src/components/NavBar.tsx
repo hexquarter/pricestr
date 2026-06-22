@@ -4,7 +4,9 @@ import { Button } from "./ui/button";
 import { ArrowUpRight } from "lucide-react";
 
 const links = [
+  { label: "Use cases", href: "/#built-for" },
   { label: "Protocol", href: "/#how-it-works" },
+  { label: "Testimonials", href: "/#testimonials" },
   { label: "Verify", href: "/#verify" },
   { label: "Pipeline", href: "/#pipeline" },
   { label: "Pricing", href: "/#pricing" },

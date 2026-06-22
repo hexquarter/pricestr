@@ -108,20 +108,21 @@ const Hero = () => {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
               <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
             </span>
-            Live signal · BTC/USD
+            Live · Signed every 10s
           </div>
 
-          <h1 className="text-6xl md:text-8xl tracking-tight font-[900] font-title uppercase leading-[0.9]">
-            Price<span className="text-violet-400">Str</span>
+          <h1 className="text-6xl tracking-tight font-[900] font-title uppercase leading-[0.9]">
+            The <span className="text-violet-400">relayed</span> BTC price you can <span className="text-violet-400">verify</span>
           </h1>
 
-          <p className="text-xl md:text-2xl font-light text-foreground/90">
-            Signed. <span className="text-violet-400">Relayed.</span>
+          <p className="text-normal font-light text-foreground/90">
+            A decentralized price distribution for Bitcoin and Nostr-native financial infrastructure.
           </p>
 
           <div className="border-l border-violet-400/60 pl-5 flex flex-col gap-1 text-sm md:text-base text-muted-foreground leading-relaxed">
+            <p>No API keys and no SDKs.</p>
+            <p>Median of 6 venues centralized, decentralized and P2P.</p>
             <p>Bitcoin price feed built natively for Nostr.</p>
-            <p>No API keys. No database. Just a signature and a relay.</p>
           </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
@@ -135,13 +136,8 @@ const Hero = () => {
             </Button>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
-            <span className="py-1.5 px-3 text-[10px] font-mono uppercase tracking-widest rounded-full border border-border/60 text-muted-foreground">
-              Open-source
-            </span>
-            <span className="py-1.5 px-3 text-[10px] font-mono uppercase tracking-widest rounded-full border border-primary/20 text-primary/80">
-              Lightning native
-            </span>
+          <div className="flex flex-wrap gap-2 pt-1 text-muted-foreground text-xs">
+            Trusted by <a href='https://notarybtc.com' target='_blank' className="text-white uppercase font-bold font-mono tracking-widest">notarybtc</a>
           </div>
         </div>
 
@@ -173,7 +169,7 @@ const Hero = () => {
 
 
                 {hasData &&
-                  Object.entries(chartData[chartData.length-1]?.sources || {}).map(([source]) => (
+                  Object.entries(chartData[chartData.length - 1]?.sources || {}).map(([source]) => (
                     <Line
                       key={source}
                       dataKey={`sources.${source}`}
