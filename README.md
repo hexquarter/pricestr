@@ -32,8 +32,8 @@ No backend needed for the free tier. No database. No API key.
 - 10‑second updates
 - Webhooks (10k/month)
 - Priority support
-- **Payment:** 15,000 sats/month via Lightning
-- **Authentication:** domain‑bound short‑lived tokens (no user signing required)
+- **Payment:** $10/month
+- **Authentication:** Nostr's public key - no email required
 
 ### Enterprise (custom)
 - Dedicated relay endpoint
@@ -71,7 +71,7 @@ That’s it. No API key, no backend, no database.
 Pro subscribers get:
 - A dedicated relay endpoint (e.g., wss://relay.pricestr.xyz)
 - Faster updates (10 seconds)
-- Additional pairs (ETH, EUR, etc.)
+- Additional pairs (EUR, GBP, JPY, etc.)
 - Webhooks
 
 Because the dedicated relay requires authentication, we use **NIP-42** – the Nostr Authentication protocol.
