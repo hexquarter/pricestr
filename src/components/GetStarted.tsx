@@ -45,7 +45,7 @@ const GetStarted = () => {
     const r = await Relay.connect(import.meta.env.DEV ? "ws://localhost:7777" : "wss://relay.pricestr.xyz");
     r.subscribe([{ kinds: [30078], "#t": ["pricestr/free"] }], {
       onevent(event) {
-        setRunResult(event.content);
+        setRunResult(JSON.stringify(JSON.parse(event.content), null, 2));
       },
     });
   };
@@ -135,7 +135,7 @@ const GetStarted = () => {
               <code>{snippet}</code>
             </pre>
 
-            <div className="border-t border-white/10 flex items-stretch">
+            <div className="border-t border-white/10 flex flex-col items-stretch">
               <Button
                 onClick={handleRun}
                 variant="ghost"
@@ -143,8 +143,9 @@ const GetStarted = () => {
               >
                 <PlayIcon className="h-3 w-3 mr-2" /> Run live
               </Button>
-              <div className={`flex-1 px-4 flex items-center text-[11px] font-mono text-white/60 truncate ${runResult ? "" : "opacity-50"}`}>
-                {runResult || "// output will appear here each 60s"}
+              <div className={`flex-1 p-4 flex flex-col text-[11px] font-mono text-white/60 truncate ${runResult ? "" : "opacity-50"}`}>
+                <span>{"// output will appear here each 60s"}</span>
+                <span className="text-white">{runResult ? <pre>{runResult}</pre> : ""}</span>
               </div>
             </div>
           </div>
