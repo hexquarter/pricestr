@@ -100,7 +100,7 @@ const Docs = () => (
             <Block id="overview" eyebrow="01 · overview" title="What is PriceStr?">
               <p>
                 PriceStr is a public price oracle for Bitcoin built natively on the Nostr protocol.
-                It aggregates real-time exchange data from major <span className="text-white font-bold">CEX: Binance, Kraken Coinbase</span>, <span className="font-bold text-white">Oracle (Chainlink)</span>, <span className="font-bold text-white">DEX (Uniswap)</span>, <span className="text-white font-bold">P2P Marketplace (Hyperliquid)</span> and computes
+                It aggregates real-time exchange data from major <span className="text-white font-bold">CEX: Binance, Kraken, Coinbase</span>, <span className="font-bold text-white">Oracle (Chainlink)</span>, <span className="font-bold text-white">DEX (Uniswap)</span>, <span className="text-white font-bold">P2P Marketplace (Hyperliquid)</span> and computes
                 <span className="font-bold text-violet-400"> a tamper-resistant and signed median</span>, with a dedicated Nostr keypair, and
                 broadcasts the event to the open relay network.
               </p>
@@ -112,9 +112,20 @@ const Docs = () => (
               <ul className="list-none flex flex-col gap-2 pl-0">
                 <li>· <span className="text-foreground font-bold">Verifiable</span> — every event carries a Schnorr signature bound to PriceStr's public key.</li>
                 <li>· <span className="text-foreground font-bold">Decentralized</span> — fetch from any relay storing the events. Relays cannot forge prices.</li>
-                <li>· <span className="text-foreground font-bold">Open</span> — aggregation logic, schema, and verification examples are MIT-licensed.</li>
+                <li>· <span className="text-foreground font-bold">Open</span> — client code, dashboard, schema, and verification examples are MIT-licensed.</li>
                 <li>· <span className="text-foreground font-bold">Lightning-native</span> — the Pro tier is paid in sats; no card, no account.</li>
               </ul>
+              <div className="mt-4">
+                <p className="text-foreground font-bold mb-2">Price sources breakdown:</p>
+                <ul className="list-none flex flex-col gap-1 pl-0">
+                  <li>· <span className="text-white font-bold">Coinbase</span> — USD-BTC spot</li>
+                  <li>· <span className="text-white font-bold">Binance</span> — BTCUSDT</li>
+                  <li>· <span className="text-white font-bold">Kraken</span> — XBTUSD</li>
+                  <li>· <span className="text-white font-bold">Chainlink</span> — <a href="https://etherscan.io/address/0xf4030086522a5beea4988f8ca5b36dbc97bee88c" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 underline">0xf4030086522a5beea4988f8ca5b36dbc97bee88c</a></li>
+                  <li>· <span className="text-white font-bold">Uniswap</span> — WBTC/USDC (0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48)</li>
+                  <li>· <span className="text-white font-bold">Hyperliquid</span> — perp mid prices for BTC market</li>
+                </ul>
+              </div>
             </Block>
 
             <Block id="why-nostr" eyebrow="02 · rationale" title="Why Nostr, not an HTTP API?">

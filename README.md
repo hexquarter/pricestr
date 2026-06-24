@@ -1,7 +1,13 @@
 # PriceStr
 
 **PriceStr** is a cryptographically signed Bitcoin price feed built natively for the Nostr protocol.  
-It delivers median‑aggregated exchange prices (Binance, Kraken, Coinbase) as verifiable Nostr events.
+It delivers median‑aggregated exchange prices as verifiable Nostr events from these sources:
+- Coinbase: USD-BTC spot
+- Binance: BTCUSDT
+- Kraken: XBTUSD
+- Chainlink: https://etherscan.io/address/0xf4030086522a5beea4988f8ca5b36dbc97bee88c
+- Uniswap: WBTC/USDC (0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48)
+- Hyperliquid: perp mid prices for BTC market
 
 ## Motivation
 
@@ -22,7 +28,7 @@ No backend needed for the free tier. No database. No API key.
 
 ### Free Tier (available now)
 - BTC/USD price – 60‑second updates
-- Median aggregation from Binance, Kraken, Coinbase
+- Median aggregation from Coinbase, Binance, Kraken, Chainlink, Uniswap, Hyperliquid
 - Public relays only (no authentication)
 - Signature verification examples in JavaScript/TypeScript
 - Open‑source aggregation logic
@@ -97,12 +103,12 @@ For truly serverless static sites without any backend, the free tier remains the
 ## License
 
 The following components are open source (MIT license):
-- Price aggregation logic (fetching from exchange APIs, median calculation)
+- Client code and dashboard
 - Nostr event schema and tagging conventions
 - Signature verification examples and SDK stubs
 - Relay integration helpers
 
-The production signer, webhook delivery engine closed source to protect our infrastructure and paid features. \
+The production signer, aggregator, and relay infrastructure are closed source to protect our infrastructure and paid features. \
 Commercial use of the Pro/Enterprise relay endpoints requires a paid subscription. \
 For enterprise inquiries or custom deployments, email pricestr@hexquarter.com.
 
