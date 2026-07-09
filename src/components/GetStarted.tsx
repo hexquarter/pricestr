@@ -12,7 +12,6 @@ const snippet = `import { Relay } from 'nostr-tools';
 const relay = await Relay.connect('wss://relay.pricestr.xyz');
 
 relay.subscribe([{
-  kinds: [30078],
   "#t": ['pricestr/free']
 }], {
   onevent(event) {
@@ -43,7 +42,7 @@ const GetStarted = () => {
     if (!relayPub) return;
     posthog?.capture("get_started_snippet_run");
     const r = await Relay.connect(import.meta.env.DEV ? "ws://localhost:7777" : "wss://relay.pricestr.xyz");
-    r.subscribe([{ kinds: [30078], "#t": ["pricestr/free"] }], {
+    r.subscribe([{ "#t": ["pricestr/free"] }], {
       onevent(event) {
         setRunResult(JSON.stringify(JSON.parse(event.content), null, 2));
       },
