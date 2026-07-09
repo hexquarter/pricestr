@@ -88,7 +88,7 @@ const Hero = () => {
     uniswap: "#ff007a",
   };
   return (
-    <section className="relative min-h-[100svh] flex items-center overflow-hidden pt-24 pb-16">
+    <section className="relative min-h-[100svh] flex items-center pt-24 pb-16">
       {/* subtle background grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
@@ -100,9 +100,9 @@ const Hero = () => {
         }}
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-12 gap-12 items-center">
+      <div className="relative z-10 lg:max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-12 gap-12 items-center">
         {/* Left: copy */}
-        <div className="lg:col-span-5 flex flex-col gap-8">
+        <div className="lg:col-span-5 col-span-12 flex flex-col gap-8">
           <div className="inline-flex items-center gap-2 self-start text-[10px] font-mono uppercase tracking-widest text-muted-foreground border border-border/60 rounded-full px-3 py-1">
             <span className="relative flex size-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
@@ -111,15 +111,15 @@ const Hero = () => {
             Live · Signed every 10s
           </div>
 
-          <h1 className="text-6xl tracking-tight font-[900] font-title uppercase leading-[0.9]">
-            The <span className="text-violet-400">relayed</span> BTC price you can <span className="text-violet-400">verify</span>
+          <h1 className="lg:text-8xl text-7xl lg:max-w-2xl max-w-10 tracking-tight font-[900] font-title uppercase leading-[0.9]">
+            The <span className="text-violet-400">relayed</span> BTC price
           </h1>
 
-          <p className="text-normal font-light text-foreground/90">
+          <p className="text-normal font-light text-foreground/90 max-w-80 lg:max-w-xl">
             A decentralized price distribution for Bitcoin and Nostr-native financial infrastructure.
           </p>
 
-          <div className="border-l border-violet-400/60 pl-5 flex flex-col gap-1 text-sm md:text-base text-muted-foreground leading-relaxed">
+          <div className="max-w-80 lg:max-w-xl border-l border-violet-400/60 pl-5 flex flex-col gap-1 text-sm md:text-base text-muted-foreground leading-relaxed">
             <p>No API keys and no SDKs.</p>
             <p>Median of 6 venues centralized, decentralized and P2P.</p>
             <p>Bitcoin price feed built natively for Nostr.</p>
