@@ -24,7 +24,7 @@ const Index = () => (
       <Verify />
       <Compare />
       <Community />
-      <Funding />
+      {/* <Funding /> */}
       <FAQ />
       <GetStarted />
     </div>

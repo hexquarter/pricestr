@@ -49,9 +49,9 @@ const NavBar = () => {
           <Button asChild size="sm" variant="outline" className="font-mono uppercase text-[11px] tracking-widest hover:bg-primary border-0">
             <a href="/#get-started">Integrate</a>
           </Button>
-          <Button asChild size="sm" className="font-mono uppercase text-[11px] tracking-widest">
+          {/* <Button asChild size="sm" className="font-mono uppercase text-[11px] tracking-widest">
             <a href="/#support">Support us <ArrowUpRight /></a>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </header>
