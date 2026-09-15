@@ -60,8 +60,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd pricestr-relay
+            cd pricestr
             git pull origin main
             yarn install --frozen-lockfile
-            yarn workspace @pricestr/relay build
             pm2 restart pricestr-relay
