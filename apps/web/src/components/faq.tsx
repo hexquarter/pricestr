@@ -6,10 +6,10 @@ const items = [
     q: "Is PriceStr really free?",
     a: "Yes — completely, and permanently. No API keys, no sign-up, no rate-limit dashboard, no paid tier hiding behind the free one. The relay is public and the events are public.",
   },
-  {
-    q: "Then how do you pay for it?",
-    a: "Two channels, both published in the open: voluntary Lightning zaps from people who find the feed useful, and affiliate commissions from tools we already use ourselves.",
-  },
+  // {
+  //   q: "Then how do you pay for it?",
+  //   a: "Two channels, both published in the open: voluntary Lightning zaps from people who find the feed useful, and affiliate commissions from tools we already use ourselves.",
+  // },
   {
     q: "Why Nostr instead of a REST API?",
     a: "Because a REST API is an opaque request to a server you can't audit. A Nostr event is signed by a pubkey, addressable on any relay, and verifiable offline by your client. Same data, completely different trust model.",
@@ -24,7 +24,7 @@ const items = [
   },
   {
     q: "Do you take a position on the price?",
-    a: "No. The aggregation logic is open-source and runs deterministically over 6 venues. We sign the median — we don't choose it.",
+    a: "No. The aggregation logic is open-source and runs deterministically over 7 venues. We sign the median — we don't choose it.",
   },
   {
     q: "Can I self-host the whole pipeline?",

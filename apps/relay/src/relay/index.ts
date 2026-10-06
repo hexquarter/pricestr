@@ -35,7 +35,6 @@ export function attachWebSocket(server: any, relay: NostrRelay) {
         relay.handleConnection(ws);
 
         ws.on('message', async data => {
-            console.log('Received message:', data.toString());
             try {
                 const message = await validator.validateIncomingMessage(data);
                 await relay.handleMessage(ws, message);

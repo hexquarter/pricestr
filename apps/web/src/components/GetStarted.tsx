@@ -41,15 +41,20 @@ const GetStarted = () => {
   const handleRun = async () => {
     if (!relayPub) return;
     posthog?.capture("get_started_snippet_run");
-    const r = await Relay.connect(import.meta.env.DEV ? "ws://localhost:7777" : "wss://relay.pricestr.xyz");
-    r.subscribe([{ "#t": ["pricestr"] }], {
-      onevent(event: NostrEvent) {
+    try {
+      const r = await Relay.connect(import.meta.env.DEV ? "ws://localhost:7777" : "wss://relay.pricestr.xyz");
+      r.subscribe([{ "#t": ["pricestr"] }], {
+        onevent(event: NostrEvent) {
 
-        const eventData = JSON.parse(event.content)
-        eventData.timestamp = new Date(event.created_at * 1000).toISOString()
-        setRunResult(JSON.stringify(eventData, null, 2));
-      }
-    });
+          const eventData = JSON.parse(event.content)
+          eventData.timestamp = new Date(event.created_at * 1000).toISOString()
+          setRunResult(JSON.stringify(eventData, null, 2));
+        }
+      });
+    }
+    catch(e) {
+      console.error(e)
+    }
   };
 
   return (

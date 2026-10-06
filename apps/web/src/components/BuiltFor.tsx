@@ -12,7 +12,7 @@ const actors = [
   {
     icon: ArrowRightLeft,
     title: "DEXs and Swaps",
-    body: "Settle quotes against a signed reference price. Median of 6 venues, replaceable event, sub-10s freshness."
+    body: "Settle quotes against a signed reference price. Median of 7 venues, replaceable event, sub-10s freshness."
   },
   {
     icon: Tickets,

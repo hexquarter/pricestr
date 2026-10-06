@@ -6,6 +6,7 @@ import { posthog } from '../common/posthog.js';
 import { getChainLinkBTCPriceFeed } from "./chainlink.js";
 import { getHyperliquidSpotPrice } from "./hyperliquid.js";
 import { getUniswapV4WBTCPrice } from "./uniswap.js";
+import { getBitcoinDiaPrice } from "./dia.js";
 
 type Source = {
   name: string;
@@ -58,7 +59,7 @@ function median(values: number[]) {
 
 export async function fetchAggregatedPrice(): Promise<PriceData> {
   const results = await Promise.allSettled(
-    [...CEX_SOURCES.map(fetchUrlSource), getHyperliquidSpotPrice(), getChainLinkBTCPriceFeed(), getUniswapV4WBTCPrice()]
+    [...CEX_SOURCES.map(fetchUrlSource), getHyperliquidSpotPrice(), getChainLinkBTCPriceFeed(), getUniswapV4WBTCPrice(), getBitcoinDiaPrice()]
   );
 
   const sources: { [key: string]: number } = {};

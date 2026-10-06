@@ -58,6 +58,7 @@ const Hero = () => {
     hyperliquid: "#00ffcc",
     chainlink: "#0622f9",
     uniswap: "#ff007a",
+    dia: "#15ff00"
   };
   return (
     <section className="relative min-h-[100svh] flex items-center pt-24 pb-16">
@@ -93,7 +94,7 @@ const Hero = () => {
 
           <div className="max-w-80 lg:max-w-xl border-l border-violet-400/60 pl-5 flex flex-col gap-1 text-sm md:text-base text-muted-foreground leading-relaxed">
             <p>Built for Bitcoin and Nostr-native financial infrastructure.</p>
-            <p>Median of 6 venues centralized, decentralized and P2P.</p>
+            <p>Median of 7 venues centralized and decentralized</p>
             <p>Oriented for developers who are seeking no authentication.</p>
           </div>
 

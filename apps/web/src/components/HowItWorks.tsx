@@ -5,7 +5,7 @@ const steps = [
   {
     n: "01",
     title: "Aggregated",
-    body: "Every cycle we fan out to CEX, DEX, Oracleand P2P venues in parallel. Stale ticks are rejected, outliers are dropped, and the median of the survivors becomes the canonical print.",
+    body: "Every cycle we fan out to CEX, DEX, Oracle and P2P venues in parallel. Stale ticks are rejected, outliers are dropped, and the median of the survivors becomes the canonical print.",
     items: [
       'Stale ticks rejected',
       'Outliers dropped',
