@@ -1,4 +1,8 @@
-const links = [
+import { Link } from "react-router-dom";
+
+const GITHUB_URL = "https://github.com/hexquarter/pricestr";
+
+const internalLinks = [
   { label: "Docs", href: "/docs" },
   { label: "Pubkey", href: "/#get-started" },
   { label: "Terms of Use", href: "/terms" },
@@ -18,15 +22,23 @@ const Footer = () => (
           </p>
         </div>
         <nav className="flex flex-wrap items-center gap-6">
-          {links.map((link) => (
-            <a
+          {internalLinks.map((link) => (
+            <Link
               key={link.label}
-              href={link.href}
+              to={link.href}
               className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+          >
+            GitHub
+          </a>
         </nav>
       </div>
 

@@ -10,7 +10,7 @@ const rows: { label: string; pricestr: Cell; coingecko: Cell; chainlink: Cell }[
   { label: "Nostr-native transport", pricestr: true, coingecko: false, chainlink: false },
   { label: "10-second cadence", pricestr: true, coingecko: "partial", chainlink: false },
   { label: "Self-hostable relay", pricestr: true, coingecko: false, chainlink: false },
-  { label: "Price for Pro tier", pricestr: "Free", coingecko: "$129+ / mo", chainlink: "Gas + integration" },
+  { label: "Price", pricestr: "Free", coingecko: "$129+ / mo", chainlink: "Gas + integration" },
 ];
 
 const renderCell = (v: Cell, accent = false) => {
@@ -28,7 +28,7 @@ const Compare = () => (
         title={
           <>
             Simple since <br />
-            <span className="text-violet-400">the begining</span>
+            <span className="text-violet-400">day one</span>
           </>
         }
         lead="PriceStr ships a signed event you can integrate in 8 lines of code. No key, no subscription."

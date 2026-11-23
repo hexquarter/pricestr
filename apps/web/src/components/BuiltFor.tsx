@@ -1,5 +1,4 @@
 import { ArrowRightLeft, Bot, ShieldCheck, Tickets, Wallet, Zap } from "lucide-react";
-import ProofModel from "./ProofModel";
 import { SectionHead } from "./SectionHead";
 
 const actors = [

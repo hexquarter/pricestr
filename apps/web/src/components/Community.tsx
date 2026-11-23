@@ -1,8 +1,5 @@
-import { ExternalLink, Github, Quote, Share2 } from "lucide-react";
+import { ExternalLink, Quote } from "lucide-react";
 import { SectionHead } from "./SectionHead";
-import { Button } from "./ui/button";
-import { ZapButton } from "./ZapButton";
-import { toast } from "sonner";
 import { BsLinkedin } from "react-icons/bs";
 
 const testimonials = [

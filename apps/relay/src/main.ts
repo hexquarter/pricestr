@@ -26,7 +26,6 @@ const server = app.listen(config.port, async () => {
     console.log(`PriceStr listening on :${config.port}`);
     console.log(`  Relay ws://localhost:${config.port}`);
     console.log(`  NIP-11 http://localhost:${config.port}/`);
-    console.log(`  Subscribe to POST http://localhost:${config.port}/subscribe`);
 
     // ── Startup ───────────────────────────────────────────────────────────────────
     try {
