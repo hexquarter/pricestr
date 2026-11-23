@@ -32,16 +32,44 @@ const CEX_SOURCES: Source[] = [
   },
 ];
 
-async function fetchUrlSource(source: Source): Promise<{ name: string, price: number }> {
+// Expected, transient failure of an external price source (timeout, HTTP
+// error, network failure). Tracked as an event, not an exception.
+class SourceUnavailableError extends Error {}
+
+function isTimeoutError(err: Error): boolean {
+  // AbortSignal.timeout rejects with a DOMException named 'TimeoutError'
+  return err.name === 'TimeoutError' || err.name === 'AbortError';
+}
+
+function isNetworkError(err: Error): boolean {
+  // fetch rejects with TypeError on DNS/connection failures
+  return err instanceof TypeError;
+}
+
+// Returns null on expected source failure instead of throwing, so timeouts
+// don't flood error tracking. Rethrows unexpected errors (e.g. a parse error
+// caused by an API response shape change) for posthog.captureException.
+async function fetchUrlSource(source: Source): Promise<{ name: string, price: number } | null> {
   try {
     const res = await fetch(source.url, { signal: AbortSignal.timeout(5000) });
-    if (!res.ok) throw new Error(`${source.name}: HTTP ${res.status}`);
+    if (!res.ok) throw new SourceUnavailableError(`${source.name}: HTTP ${res.status}`);
     const data = await res.json();
     return { name: source.name, price: source.parse(data) };
   }
   catch (e) {
     const err = e as Error;
     console.warn(`Error fetching ${source.name}:`, err.message);
+    if (err instanceof SourceUnavailableError || isTimeoutError(err) || isNetworkError(err)) {
+      posthog.capture({
+        distinctId: 'system',
+        event: 'price_source_failed',
+        properties: {
+          source: source.name,
+          error: err.message,
+        },
+      });
+      return null;
+    }
     posthog.captureException(err, '', {
       source: source.name
     })
@@ -67,6 +95,8 @@ export async function fetchAggregatedPrice(): Promise<PriceData> {
 
   for (const result of results) {
     if (result.status === 'fulfilled') {
+      // null = expected source failure, already recorded in fetchUrlSource
+      if (result.value === null) continue;
       const { name, price } = result.value;
       sources[name] = Number(price.toFixed(2));
       prices.push(price);
@@ -91,15 +121,28 @@ export async function fetchAggregatedPrice(): Promise<PriceData> {
     timestamp: Math.floor(Date.now() / 1000),
   } as PriceData;
 
-  const fxRates = await fetchFxRates()
-  data.fxRates = fxRates
+  // FX rates are supplementary: if they fail, still publish the price event
+  // without fxRates (buildEvent omits it from the Nostr content).
+  try {
+    data.fxRates = await fetchFxRates()
+  } catch (e) {
+    const err = e as Error;
+    console.warn('[oracle] fx rates fetch failed, publishing without fxRates:', err.message);
+    posthog.capture({
+      distinctId: 'system',
+      event: 'fx_rates_failed',
+      properties: {
+        error: err.message,
+      },
+    });
+  }
   return data
 }
 
 async function fetchFxRates(): Promise<FxRate> {
   const url = `https://api.frankfurter.app/latest?from=USD`;
 
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
   if (!res.ok) {
     throw new Error(`Frankfurter API error: ${res.status}`);
   }
