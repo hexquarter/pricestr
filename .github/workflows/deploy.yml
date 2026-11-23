@@ -54,10 +54,14 @@ jobs:
 
     steps:
       - name: Verify VPS secrets are configured
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           missing=0
           for s in VPS_HOST VPS_USER SSH_KEY; do
-            if [ -z "$(eval "echo \${{ secrets.$s }}")" ]; then
+            if [ -z "${!s}" ]; then
               echo "::error::Secret '$s' is empty or missing. Add it under Settings → Secrets and variables → Actions → Repository secrets."
               missing=1
             fi
