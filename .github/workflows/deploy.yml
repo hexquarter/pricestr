@@ -53,8 +53,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Verify VPS secrets are configured
+        run: |
+          missing=0
+          for s in VPS_HOST VPS_USER SSH_KEY; do
+            if [ -z "$(eval "echo \${{ secrets.$s }}")" ]; then
+              echo "::error::Secret '$s' is empty or missing. Add it under Settings → Secrets and variables → Actions → Repository secrets."
+              missing=1
+            fi
+          done
+          exit $missing
+
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
